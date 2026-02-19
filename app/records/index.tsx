@@ -52,11 +52,11 @@ export default function RecordsScreen() {
           <View className="flex-row flex-wrap gap-1.5">
             {entries.map(([team, score], i) => (
               <View key={team} className="flex-row items-center">
-                <Text className="text-sm text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                <Text className="text-sm text-gray-500 bg-gray-50 px-2 py-0.5 rounded-lg">
                   {team} <Text className="font-bold text-primary">{String(score)}</Text>
                 </Text>
                 {i < entries.length - 1 && (
-                  <Text className="text-gray-300 ml-1.5">·</Text>
+                  <Text className="text-gray-200 ml-1.5">·</Text>
                 )}
               </View>
             ))}
@@ -84,7 +84,14 @@ export default function RecordsScreen() {
     const dateOnly = item.gameDate.split("T")[0].split(" ")[0];
     return (
       <Pressable
-        className="bg-white rounded-xl px-4 py-3 mb-2 border border-gray-100"
+        className="bg-white rounded-2xl px-4 py-3.5 mb-2.5"
+        style={{
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 1,
+        }}
         onLongPress={() => handleDelete(item)}
       >
         {/* 1행: 이모지 + 종목 + 학년반 + 날짜 */}
@@ -93,10 +100,10 @@ export default function RecordsScreen() {
           <Text className="font-bold text-secondary text-base" numberOfLines={1}>
             {item.gameType}
           </Text>
-          <Text className="text-sm text-gray-400 flex-1" numberOfLines={1}>
+          <Text className="text-sm text-gray-300 flex-1" numberOfLines={1}>
             {item.teamName}
           </Text>
-          <Text className="text-xs text-gray-400 shrink-0">{dateOnly}</Text>
+          <Text className="text-xs text-gray-300 shrink-0">{dateOnly}</Text>
         </View>
         {/* 2행: 점수 */}
         <View className="mt-1.5">{renderScores(item)}</View>
@@ -106,19 +113,21 @@ export default function RecordsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
-      <View className="px-6 py-2">
-        <Text className="text-sm text-gray-500">
+      <View className="px-6 py-2.5">
+        <Text className="text-sm text-gray-400">
           총 {records.length}건의 경기 기록
         </Text>
       </View>
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6B9BD2" />
+          <ActivityIndicator size="large" color="#3B82F6" />
         </View>
       ) : records.length === 0 ? (
         <View className="flex-1 items-center justify-center">
-          <Text className="text-4xl mb-3">📊</Text>
+          <View className="bg-gray-100 w-20 h-20 rounded-3xl items-center justify-center mb-4">
+            <Text style={{ fontSize: 36 }}>📊</Text>
+          </View>
           <Text className="text-tablet-sm text-gray-400">
             경기 기록이 없습니다
           </Text>

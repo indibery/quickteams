@@ -37,7 +37,14 @@ export default function TeamsListScreen() {
 
   const renderTeam = ({ item }: { item: Team }) => (
     <Pressable
-      className="bg-white rounded-xl p-5 mb-3 border border-gray-100"
+      className="bg-white rounded-2xl p-5 mb-3 active:scale-[0.98]"
+      style={{
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 1,
+      }}
       onPress={() => router.push(`/teams/${item.id}`)}
     >
       <View className="flex-row items-center">
@@ -45,19 +52,19 @@ export default function TeamsListScreen() {
           <Text style={{ fontSize: 24 }} className="font-bold text-secondary">
             {item.grade}학년 {item.class}반
           </Text>
-          <View className="bg-sky px-3 py-1 rounded-lg">
+          <View className="bg-blue-50 px-3 py-1 rounded-xl">
             <Text style={{ fontSize: 18 }} className="font-bold text-primary">
               {item.teamCount}팀 · {item.teamType === "mixed" ? "혼성" : "성별분리"}
             </Text>
           </View>
           {item.label ? (
-            <View className="bg-sunny/40 px-2.5 py-0.5 rounded-lg">
+            <View className="bg-amber-50 px-2.5 py-0.5 rounded-xl">
               <Text style={{ fontSize: 14 }} className="font-bold text-secondary">
                 {item.label}
               </Text>
             </View>
           ) : null}
-          <Text className="text-xs text-gray-400">
+          <Text className="text-xs text-gray-300">
             {item.createdAt.split(" ")[0]}
           </Text>
         </View>
@@ -69,7 +76,16 @@ export default function TeamsListScreen() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
       {/* 필터 */}
-      <View className="bg-white px-6 py-3 flex-row gap-3 border-b border-gray-100">
+      <View
+        className="bg-white px-6 py-3 flex-row gap-3"
+        style={{
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 3,
+          elevation: 1,
+        }}
+      >
         <View className="flex-1">
           <PickerSelect
             label="학년"
@@ -80,8 +96,8 @@ export default function TeamsListScreen() {
         </View>
       </View>
 
-      <View className="px-6 py-2">
-        <Text className="text-sm text-gray-500">
+      <View className="px-6 py-2.5">
+        <Text className="text-sm text-gray-400">
           {grade === 0 ? "전체" : `${grade}학년`} · {teams.length}개 팀
         </Text>
       </View>
@@ -92,12 +108,14 @@ export default function TeamsListScreen() {
         </View>
       ) : teams.length === 0 ? (
         <View className="flex-1 items-center justify-center">
-          <Text className="text-4xl mb-3">📋</Text>
+          <View className="bg-gray-100 w-20 h-20 rounded-3xl items-center justify-center mb-4">
+            <Text style={{ fontSize: 36 }}>📋</Text>
+          </View>
           <Text className="text-tablet-sm text-gray-400">
             저장된 팀이 없습니다
           </Text>
           <Pressable
-            className="bg-primary rounded-xl px-6 py-3 mt-4"
+            className="bg-primary rounded-2xl px-6 py-3 mt-4 active:opacity-80"
             onPress={() => router.push("/teams/new")}
           >
             <Text className="text-white font-bold">새 팀 만들기</Text>

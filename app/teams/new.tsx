@@ -339,25 +339,34 @@ export default function TeamManagementScreen() {
   // --- 팀 카드 렌더 ---
   const renderTeam = useCallback(
     ({ item }: { item: Team }) => (
-      <View className="bg-white rounded-xl p-5 mb-3 border border-gray-100">
+      <View
+        className="bg-white rounded-2xl p-5 mb-3"
+        style={{
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 1,
+        }}
+      >
         <View className="flex-row items-center mb-2">
           <View className="flex-1">
             <View className="flex-row items-center gap-2 flex-wrap">
               <Text style={{ fontSize: 20 }} className="font-bold text-secondary">
                 {item.grade}학년 {item.class}반
               </Text>
-              <View className="bg-sky px-2.5 py-0.5 rounded-lg">
+              <View className="bg-blue-50 px-2.5 py-0.5 rounded-xl">
                 <Text className="text-sm font-bold text-primary">
                   {item.teamCount}팀 · {item.teamType === "mixed" ? "혼성" : "성별분리"}
                 </Text>
               </View>
               {item.label ? (
-                <View className="bg-sunny/40 px-2.5 py-0.5 rounded-lg">
+                <View className="bg-amber-50 px-2.5 py-0.5 rounded-xl">
                   <Text className="text-sm font-bold text-secondary">{item.label}</Text>
                 </View>
               ) : null}
             </View>
-            <Text className="text-xs text-gray-400 mt-1">
+            <Text className="text-xs text-gray-300 mt-1">
               {item.createdAt.split(" ")[0]}
             </Text>
           </View>
@@ -366,19 +375,19 @@ export default function TeamManagementScreen() {
         {/* 액션 버튼 */}
         <View className="flex-row gap-2 mt-2">
           <Pressable
-            className="flex-1 py-3 rounded-lg bg-sky items-center active:opacity-70"
+            className="flex-1 py-3 rounded-xl bg-blue-50 items-center active:opacity-80"
             onPress={() => handleViewOpen(item)}
           >
             <Text className="text-tablet-sm font-bold text-primary">👀 보기</Text>
           </Pressable>
           <Pressable
-            className="flex-1 py-3 rounded-lg bg-gray-100 items-center active:opacity-70"
+            className="flex-1 py-3 rounded-xl bg-gray-50 items-center active:opacity-80"
             onPress={() => handleEditOpen(item)}
           >
             <Text className="text-tablet-sm font-bold text-gray-600">✏️ 편집</Text>
           </Pressable>
           <Pressable
-            className="py-3 px-4 rounded-lg bg-red-50 items-center active:opacity-70"
+            className="py-3 px-4 rounded-xl bg-red-50 items-center active:opacity-80"
             onPress={() => handleDelete(item)}
           >
             <Text className="text-tablet-sm font-bold text-red-500">🗑️</Text>
@@ -392,7 +401,16 @@ export default function TeamManagementScreen() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
       {/* 필터 */}
-      <View className="bg-white px-6 py-3 flex-row gap-3 border-b border-gray-100">
+      <View
+        className="bg-white px-6 py-3 flex-row gap-3"
+        style={{
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 3,
+          elevation: 1,
+        }}
+      >
         <View className="flex-1">
           <PickerSelect
             label="학년"
@@ -402,7 +420,7 @@ export default function TeamManagementScreen() {
           />
         </View>
         <Pressable
-          className="bg-primary rounded-xl px-5 items-center justify-center self-end"
+          className="bg-primary rounded-2xl px-5 items-center justify-center self-end active:opacity-80"
           style={{ height: 50 }}
           onPress={() => setShowCreate(true)}
         >
@@ -410,8 +428,8 @@ export default function TeamManagementScreen() {
         </Pressable>
       </View>
 
-      <View className="px-6 py-2">
-        <Text className="text-sm text-gray-500">
+      <View className="px-6 py-2.5">
+        <Text className="text-sm text-gray-400">
           {filterGrade === 0 ? "전체" : `${filterGrade}학년`} · {filteredTeams.length}개 팀
         </Text>
       </View>
@@ -423,10 +441,12 @@ export default function TeamManagementScreen() {
         </View>
       ) : filteredTeams.length === 0 ? (
         <View className="flex-1 items-center justify-center">
-          <Text className="text-4xl mb-3">📋</Text>
+          <View className="bg-gray-100 w-20 h-20 rounded-3xl items-center justify-center mb-4">
+            <Text style={{ fontSize: 36 }}>📋</Text>
+          </View>
           <Text className="text-tablet-sm text-gray-400">저장된 팀이 없습니다</Text>
           <Pressable
-            className="bg-primary rounded-xl px-6 py-3 mt-4"
+            className="bg-primary rounded-2xl px-6 py-3 mt-4 active:opacity-80"
             onPress={() => setShowCreate(true)}
           >
             <Text className="text-white font-bold">+ 새 팀 만들기</Text>

@@ -158,7 +158,10 @@ export default function SettingsScreen() {
     <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
       <ScrollView className="flex-1 px-6 pt-4">
         {/* 학생 일괄 입력 */}
-        <View className="bg-white rounded-2xl p-5 mb-4">
+        <View
+          className="bg-white rounded-2xl p-5 mb-4"
+          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+        >
           <Text className="text-tablet-sm font-bold text-secondary mb-3">
             학생 일괄 입력
           </Text>
@@ -166,7 +169,7 @@ export default function SettingsScreen() {
             여러 학생을 한번에 입력합니다. 테스트 데이터 준비에 유용합니다.
           </Text>
           <Pressable
-            className="bg-sky rounded-xl py-3 px-4"
+            className="bg-blue-50 rounded-2xl py-3 px-4 active:opacity-80"
             onPress={() => setShowBatchImport(true)}
           >
             <Text className="text-tablet-sm text-primary font-bold">
@@ -176,14 +179,17 @@ export default function SettingsScreen() {
         </View>
 
         {/* 앱 정보 */}
-        <View className="bg-white rounded-2xl p-5 mb-4">
+        <View
+          className="bg-white rounded-2xl p-5 mb-4"
+          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+        >
           <Text className="text-tablet-md font-bold text-secondary mb-2">
-            QuickTeams v2
+            바로팀 v2.0.3
           </Text>
-          <Text className="text-sm text-gray-500">
-            체육 팀짜기 · 태블릿 최적화
+          <Text className="text-sm text-gray-400">
+            바로팀 · 태블릿 최적화
           </Text>
-          <View className="border-t border-gray-100 mt-3 pt-3">
+          <View className="border-t border-gray-50 mt-3 pt-3">
             <InfoRow label="Expo SDK" value="54" />
             <InfoRow label="React Native" value="0.81" />
             <InfoRow label="데이터 저장" value="로컬 SQLite (오프라인)" />
@@ -191,7 +197,10 @@ export default function SettingsScreen() {
         </View>
 
         {/* 능력 점수 공식 */}
-        <View className="bg-white rounded-2xl p-5 mb-4">
+        <View
+          className="bg-white rounded-2xl p-5 mb-4"
+          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+        >
           <Text className="text-tablet-sm font-bold text-secondary mb-3">
             능력 점수 공식
           </Text>
@@ -204,12 +213,15 @@ export default function SettingsScreen() {
         </View>
 
         {/* 데이터 관리 */}
-        <View className="bg-white rounded-2xl p-5 mb-4">
+        <View
+          className="bg-white rounded-2xl p-5 mb-4"
+          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+        >
           <Text className="text-tablet-sm font-bold text-secondary mb-3">
             데이터 관리
           </Text>
           <Pressable
-            className="bg-sky rounded-xl py-3 px-4 mb-3"
+            className="bg-blue-50 rounded-2xl py-3 px-4 mb-3 active:opacity-80"
             onPress={handleExportCSV}
           >
             <Text className="text-tablet-sm text-primary font-bold">
@@ -217,7 +229,7 @@ export default function SettingsScreen() {
             </Text>
           </Pressable>
           <Pressable
-            className="bg-red-50 rounded-xl py-3 px-4"
+            className="bg-red-50 rounded-2xl py-3 px-4 active:opacity-80"
             onPress={handleResetData}
           >
             <Text className="text-tablet-sm text-red-500 font-bold">
@@ -227,12 +239,15 @@ export default function SettingsScreen() {
         </View>
 
         {/* 개인정보 */}
-        <View className="bg-white rounded-2xl p-5 mb-8">
+        <View
+          className="bg-white rounded-2xl p-5 mb-8"
+          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+        >
           <Text className="text-tablet-sm font-bold text-secondary mb-2">
             개인정보 보호
           </Text>
-          <Text className="text-sm text-gray-500 leading-5">
-            QuickTeams는 모든 데이터를 기기 내에만 저장합니다. 외부 서버로
+          <Text className="text-sm text-gray-400 leading-5">
+            바로팀은 모든 데이터를 기기 내에만 저장합니다. 외부 서버로
             전송되는 데이터는 없으며, 인터넷 연결 없이 완전히 오프라인으로
             동작합니다.
           </Text>

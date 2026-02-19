@@ -16,12 +16,12 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
 
   return (
     <View>
-      <Text className="text-sm text-gray-500 mb-1">{label}</Text>
+      <Text className="text-sm text-gray-400 mb-1">{label}</Text>
       <Pressable
-        className="border border-gray-300 rounded-xl px-4 py-3 bg-white"
+        className="bg-gray-50 rounded-2xl px-4 py-3 active:opacity-80"
         onPress={() => setOpen(true)}
       >
-        <Text className="text-tablet-sm text-secondary">
+        <Text className="text-tablet-sm text-secondary font-medium">
           {selected?.label ?? "선택"}
         </Text>
       </Pressable>
@@ -30,8 +30,17 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
           className="flex-1 bg-black/40 justify-center items-center"
           onPress={() => setOpen(false)}
         >
-          <View className="bg-white rounded-2xl w-[300px] max-h-[400px] p-4">
-            <Text className="text-tablet-md font-bold text-secondary mb-3">
+          <View
+            className="bg-white rounded-3xl w-[300px] max-h-[400px] p-5"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.15,
+              shadowRadius: 24,
+              elevation: 8,
+            }}
+          >
+            <Text className="text-tablet-md font-bold text-secondary mb-4">
               {label}
             </Text>
             <FlatList
@@ -39,8 +48,8 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
               keyExtractor={(item) => String(item.value)}
               renderItem={({ item }) => (
                 <Pressable
-                  className={`py-3 px-4 rounded-xl mb-1 ${
-                    item.value === value ? "bg-primary/20" : ""
+                  className={`py-3 px-4 rounded-2xl mb-1 ${
+                    item.value === value ? "bg-blue-50" : ""
                   }`}
                   onPress={() => {
                     onSelect(item.value);

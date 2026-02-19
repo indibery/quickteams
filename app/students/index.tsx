@@ -118,13 +118,20 @@ export default function StudentsScreen() {
 
   const renderStudent = ({ item }: { item: Student }) => (
     <Pressable
-      className="bg-white rounded-xl p-4 mb-2 flex-row items-center border border-gray-100 active:opacity-80"
+      className="bg-white rounded-2xl p-4 mb-2.5 flex-row items-center active:opacity-80"
+      style={{
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 1,
+      }}
       onPress={() => setEditingStudent(item)}
     >
       {/* 성별 아이콘 */}
       <View
-        className={`w-11 h-11 rounded-full items-center justify-center mr-3 ${
-          item.gender === "M" ? "bg-sky" : "bg-sunny/30"
+        className={`w-11 h-11 rounded-xl items-center justify-center mr-3 ${
+          item.gender === "M" ? "bg-blue-50" : "bg-amber-50"
         }`}
       >
         <Text style={{ fontSize: 22 }}>
@@ -139,16 +146,16 @@ export default function StudentsScreen() {
         </Text>
         <View className="flex-row gap-2 mt-1">
           {item.runningRecord && (
-            <Text className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+            <Text className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-lg">
               🏃 {item.runningRecord}초
             </Text>
           )}
           {item.adjustment !== 0 && (
             <Text
-              className={`text-xs px-2 py-0.5 rounded font-bold ${
+              className={`text-xs px-2 py-0.5 rounded-lg font-bold ${
                 item.adjustment > 0
-                  ? "text-primary bg-sky"
-                  : "text-sunny-dark bg-sunny/30"
+                  ? "text-primary bg-blue-50"
+                  : "text-amber-600 bg-amber-50"
               }`}
             >
               능력 보정 {item.adjustment > 0 ? `+${item.adjustment}` : item.adjustment}
@@ -159,8 +166,8 @@ export default function StudentsScreen() {
 
       {/* 능력 점수 */}
       {item.abilityScore != null && (
-        <View className="bg-primary/10 rounded-lg px-3 py-1 mr-2">
-          <Text className="text-xs text-gray-500">능력</Text>
+        <View className="bg-blue-50 rounded-xl px-3 py-1.5 mr-2">
+          <Text className="text-xs text-gray-400">능력</Text>
           <Text className="text-tablet-sm font-bold text-primary">
             {item.abilityScore.toFixed(1)}
           </Text>
@@ -169,7 +176,7 @@ export default function StudentsScreen() {
 
       {/* 개별 삭제 버튼 */}
       <Pressable
-        className="w-9 h-9 rounded-lg bg-red-50 items-center justify-center active:bg-red-100"
+        className="w-9 h-9 rounded-xl bg-red-50 items-center justify-center active:bg-red-100"
         onPress={() => handleDelete(item)}
         hitSlop={8}
       >
@@ -181,7 +188,16 @@ export default function StudentsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
       {/* 필터 영역 */}
-      <View className="bg-white px-6 py-3 flex-row gap-3 border-b border-gray-100">
+      <View
+        className="bg-white px-6 py-3 flex-row gap-3"
+        style={{
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 3,
+          elevation: 1,
+        }}
+      >
         <View className="flex-1">
           <PickerSelect
             label="학년"
@@ -200,7 +216,7 @@ export default function StudentsScreen() {
         </View>
         {/* 학생 추가 */}
         <Pressable
-          className="bg-primary rounded-xl px-5 items-center justify-center self-end"
+          className="bg-primary rounded-2xl px-5 items-center justify-center self-end active:opacity-80"
           style={{ height: 50 }}
           onPress={() => setShowForm(true)}
         >
@@ -208,7 +224,7 @@ export default function StudentsScreen() {
         </Pressable>
         {/* 학급 전체 삭제 */}
         <Pressable
-          className="bg-red-50 border border-red-200 rounded-xl px-4 items-center justify-center self-end"
+          className="bg-red-50 rounded-2xl px-4 items-center justify-center self-end active:opacity-80"
           style={{ height: 50 }}
           onPress={handleDeleteClass}
         >
@@ -217,8 +233,8 @@ export default function StudentsScreen() {
       </View>
 
       {/* 학생 수 */}
-      <View className="px-6 py-2">
-        <Text className="text-sm text-gray-500">
+      <View className="px-6 py-2.5">
+        <Text className="text-sm text-gray-400">
           {selectedGrade}학년 {selectedClass}반 · {students.length}명
         </Text>
       </View>
@@ -230,7 +246,9 @@ export default function StudentsScreen() {
         </View>
       ) : students.length === 0 ? (
         <View className="flex-1 items-center justify-center">
-          <Text className="text-4xl mb-3">📝</Text>
+          <View className="bg-gray-100 w-20 h-20 rounded-3xl items-center justify-center mb-4">
+            <Text style={{ fontSize: 36 }}>📝</Text>
+          </View>
           <Text className="text-tablet-sm text-gray-400">
             학생을 추가해주세요
           </Text>

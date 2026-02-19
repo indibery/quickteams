@@ -9,17 +9,18 @@ import { migrateDbIfNeeded } from "@/lib/db/database";
 function AppContent() {
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Stack
           screenOptions={{
             headerStyle: { backgroundColor: "#3B82F6" },
             headerTintColor: "#fff",
             headerTitleStyle: { fontWeight: "bold", fontSize: 20 },
+            headerShadowVisible: false,
           }}
         >
           <Stack.Screen
             name="index"
-            options={{ title: "QuickTeams" }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="students/index"
