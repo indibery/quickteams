@@ -2,29 +2,44 @@
   "expo": {
     "name": "QuickTeams",
     "slug": "QuickTeams",
-    "version": "1.0.0",
-    "orientation": "portrait",
+    "version": "2.0.2",
+    "scheme": "quickteams",
+    "orientation": "default",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#3B82F6"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "requireFullScreen": false,
+      "bundleIdentifier": "com.quickteams.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#6B9BD2"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "package": "com.quickteams.app"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "expo-sqlite",
+      "expo-router",
+      "expo-screen-orientation"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "47adb753-80b7-418b-9f02-7387878478a1"
+      }
+    },
+    "owner": "albery97"
   }
 }
