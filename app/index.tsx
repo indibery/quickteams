@@ -64,7 +64,7 @@ export default function MainScreen() {
           바로팀
         </Text>
         <Text className="text-tablet-sm text-gray-400 mb-8">
-          달리기 기록으로 공정하게 <Text className="text-primary font-bold">바로팀</Text>으로 빠르게 만들어 보세요.
+          달리기 기록으로 공정하게, <Text className="text-primary font-bold">바로팀</Text>을 빠르게 만들어 보세요.
         </Text>
 
         <View className="flex-row flex-wrap gap-4">

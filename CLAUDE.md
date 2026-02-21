@@ -5,8 +5,10 @@
 학생 달리기 기록 기반 능력 점수 계산 → 균형잡힌 팀 자동 배정 → 경기 점수판 운영.
 
 **타깃 기기**: iPad Pro 13인치 (기본) + iPhone 대응
-**현재 버전**: 2.0.2
-**배포**: `eas submit -p ios` (TestFlight)
+**현재 버전**: 2.0.3
+**앱 이름**: 바로팀 (slug: QuickTeams — EAS 연결용이라 변경 불가)
+**배포**: `eas submit -p ios` (TestFlight → App Store 심사 제출 완료)
+**Apple ID (ASC)**: 6751106037
 
 ---
 
@@ -83,6 +85,16 @@ sky: "#BFDBFE"          // 밝은 파랑 (남학생 배경)
 sunny: "#FCD34D"        // 노랑 (여학생 배경, 강조)
 secondary: "#1E293B"    // 진한 슬레이트 (텍스트)
 ```
+
+### 디자인 패턴 (v2.0.3 리프레시)
+- **카드**: `border` 제거, `shadow-sm` 소프트 그림자 사용
+- **모서리**: `rounded-2xl` ~ `rounded-3xl` (기존 rounded-xl보다 더 둥글게)
+- **빈 상태**: 큰 아이콘 박스 (bg-gray-100 w-20 h-20 rounded-3xl) + 텍스트
+- **PickerSelect**: `bg-gray-50 rounded-2xl` (테두리 없음)
+- **필터 영역**: `shadow-sm` (border-b 대신)
+- **메인 메뉴**: 카드별 다른 배경색 (blue-50, indigo-50, amber-50, emerald-50)
+- **메인 화면**: `headerShown: false`, 앱 타이틀 직접 표시
+- **버튼 반응**: `active:scale-95` (메인) / `active:opacity-80` (기타)
 
 ### 폰트 크기 (iPad 최적화)
 ```js
@@ -200,6 +212,8 @@ const insets = useSafeAreaInsets();
 ---
 
 ## 앱 설정 (app.json)
+- **name**: 바로팀
+- **slug**: QuickTeams (EAS 프로젝트 ID 연결, 변경 불가)
 - **bundleIdentifier (iOS)**: `com.quickteams.app`
 - **package (Android)**: `com.quickteams.app`
 - **orientation**: default
@@ -223,3 +237,13 @@ const insets = useSafeAreaInsets();
 7. **점수판 scores 배열**: `currentTeam.teamCount`(DB값) 대신 `teamNames.length`(실제 팀 수)로 초기화 — 성별분리 시 실제 팀 수가 다름
 8. **성별분리 팀 교체**: 남자팀↔여자팀 교체 불가, 반드시 같은 성별 그룹 내에서만
 9. **일괄 입력 중복**: `INSERT` 대신 `ON CONFLICT DO UPDATE` (upsert) — 같은 번호 학생 재입력 시 갱신
+10. **기록 보기 teamName**: `teams.name`에 타임스탬프 저장됨 → `gameRepository.ts`에서 `t.grade`, `t.class`, `t.label`을 JOIN해서 "N학년 N반" 형식으로 재구성
+11. **app.json slug**: "QuickTeams" 유지 필수 — EAS 프로젝트 ID와 연결되어 변경하면 빌드 실패
+12. **App Store 스크린샷 해상도**: iPhone 6.5" = 1284x2778, iPad 12.9" = 2732x2048 (가로). iPhone 6.7"(1290x2796)은 ASC에서 거부됨
+13. **eas submit**: `ascAppId`를 eas.json에 설정해야 non-interactive 모드 동작. Apple ID 인증 필요 시 터미널에서 직접 실행
+
+## App Store 정보
+- **지원 URL**: https://indibery.github.io/quickteams/
+- **개인정보 처리방침 URL**: https://indibery.github.io/quickteams/privacy.html
+- **GitHub 저장소**: https://github.com/indibery/quickteams (public)
+- **GitHub Pages**: docs/ 폴더에서 호스팅
