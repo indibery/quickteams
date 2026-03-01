@@ -6,6 +6,7 @@ import {
   Alert,
   Modal,
   TextInput,
+  Linking,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSQLiteContext } from "expo-sqlite";
@@ -19,6 +20,7 @@ import {
 } from "@/lib/db/repositories/studentRepository";
 import PickerSelect from "@/components/common/PickerSelect";
 import type { Gender } from "@/lib/types";
+import { Colors } from "@/constants/theme";
 
 const gradeOptions = Array.from({ length: 6 }, (_, i) => ({
   label: `${i + 1}학년`,
@@ -155,24 +157,25 @@ export default function SettingsScreen() {
     .filter((line) => parseLine(line) != null).length;
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: Colors.bg }} edges={["bottom"]}>
       <ScrollView className="flex-1 px-6 pt-4">
         {/* 학생 일괄 입력 */}
         <View
-          className="bg-white rounded-2xl p-5 mb-4"
-          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+          className="rounded-2xl p-5 mb-4"
+          style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-sm font-bold text-secondary mb-3">
+          <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
             학생 일괄 입력
           </Text>
-          <Text className="text-xs text-gray-400 mb-3">
+          <Text className="text-xs mb-3" style={{ color: Colors.text3 }}>
             여러 학생을 한번에 입력합니다. 테스트 데이터 준비에 유용합니다.
           </Text>
           <Pressable
-            className="bg-blue-50 rounded-2xl py-3 px-4 active:opacity-80"
+            className="rounded-2xl py-3 px-4 active:opacity-80"
+            style={{ backgroundColor: Colors.primarySoft }}
             onPress={() => setShowBatchImport(true)}
           >
-            <Text className="text-tablet-sm text-primary font-bold">
+            <Text className="text-tablet-sm font-bold" style={{ color: Colors.primary }}>
               📋 일괄 입력 열기
             </Text>
           </Pressable>
@@ -180,59 +183,68 @@ export default function SettingsScreen() {
 
         {/* 앱 정보 */}
         <View
-          className="bg-white rounded-2xl p-5 mb-4"
-          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+          className="rounded-2xl p-5 mb-4"
+          style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-md font-bold text-secondary mb-2">
-            바로팀 v2.0.3
+          <Text className="text-tablet-md font-bold mb-1" style={{ color: Colors.text1 }}>
+            바로팀 v2.1.0
           </Text>
-          <Text className="text-sm text-gray-400">
-            바로팀 · 태블릿 최적화
+          <Text className="text-sm mb-3" style={{ color: Colors.text3 }}>
+            달리기 기록으로 공정하게 팀을 만들어요
           </Text>
-          <View className="border-t border-gray-50 mt-3 pt-3">
-            <InfoRow label="Expo SDK" value="54" />
-            <InfoRow label="React Native" value="0.81" />
-            <InfoRow label="데이터 저장" value="로컬 SQLite (오프라인)" />
+          <View style={{ borderTopWidth: 1, borderTopColor: Colors.border, paddingTop: 12 }}>
+            <InfoRow label="데이터 저장" value="로컬 (오프라인)" />
+            <Pressable
+              className="flex-row justify-between py-1.5 active:opacity-80"
+              onPress={() => Linking.openURL("mailto:bery97@gmail.com")}
+            >
+              <Text className="text-sm" style={{ color: Colors.text2 }}>피드백</Text>
+              <Text className="text-sm font-bold" style={{ color: Colors.primary }}>
+                bery97@gmail.com
+              </Text>
+            </Pressable>
           </View>
         </View>
 
         {/* 능력 점수 공식 */}
         <View
-          className="bg-white rounded-2xl p-5 mb-4"
-          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+          className="rounded-2xl p-5 mb-4"
+          style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-sm font-bold text-secondary mb-3">
+          <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
             능력 점수 공식
           </Text>
           <InfoRow label="기본" value="달리기 상대 순위 (1~5)" />
           <InfoRow label="능력 보정" value="교사가 ±5 범위로 조정" />
           <InfoRow label="조정계수" value="능력 보정 1당 ±0.2" />
-          <Text className="text-xs text-gray-400 mt-2">
+          <Text className="text-xs mt-2" style={{ color: Colors.text3 }}>
             공식: 달리기점수 + 능력 보정 × 0.2 (결과 1.0~5.0)
           </Text>
         </View>
 
         {/* 데이터 관리 */}
         <View
-          className="bg-white rounded-2xl p-5 mb-4"
-          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+          className="rounded-2xl p-5 mb-4"
+          style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-sm font-bold text-secondary mb-3">
+          <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
             데이터 관리
           </Text>
           <Pressable
-            className="bg-blue-50 rounded-2xl py-3 px-4 mb-3 active:opacity-80"
+            className="rounded-2xl py-3 px-4 mb-3 active:opacity-80"
+            style={{ backgroundColor: Colors.primarySoft }}
             onPress={handleExportCSV}
           >
-            <Text className="text-tablet-sm text-primary font-bold">
+            <Text className="text-tablet-sm font-bold" style={{ color: Colors.primary }}>
               📤 학생 데이터 CSV 내보내기
             </Text>
           </Pressable>
           <Pressable
-            className="bg-red-50 rounded-2xl py-3 px-4 active:opacity-80"
+            className="rounded-2xl py-3 px-4 active:opacity-80"
+            style={{ backgroundColor: Colors.dangerSoft }}
             onPress={handleResetData}
           >
-            <Text className="text-tablet-sm text-red-500 font-bold">
+            <Text className="text-tablet-sm font-bold" style={{ color: Colors.dangerText }}>
               🗑️ 전체 데이터 초기화
             </Text>
           </Pressable>
@@ -240,13 +252,13 @@ export default function SettingsScreen() {
 
         {/* 개인정보 */}
         <View
-          className="bg-white rounded-2xl p-5 mb-8"
-          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}
+          className="rounded-2xl p-5 mb-8"
+          style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-sm font-bold text-secondary mb-2">
+          <Text className="text-tablet-sm font-bold mb-2" style={{ color: Colors.text1 }}>
             개인정보 보호
           </Text>
-          <Text className="text-sm text-gray-400 leading-5">
+          <Text className="text-sm leading-5" style={{ color: Colors.text2 }}>
             바로팀은 모든 데이터를 기기 내에만 저장합니다. 외부 서버로
             전송되는 데이터는 없으며, 인터넷 연결 없이 완전히 오프라인으로
             동작합니다.
@@ -256,9 +268,9 @@ export default function SettingsScreen() {
 
       {/* 일괄 입력 모달 */}
       <Modal visible={showBatchImport} animationType="slide">
-        <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
-          <View className="bg-primary px-6 py-4">
-            <Text className="text-xl font-bold text-white">학생 일괄 입력</Text>
+        <View className="flex-1" style={{ backgroundColor: Colors.bg, paddingTop: insets.top }}>
+          <View className="px-6 py-4" style={{ backgroundColor: Colors.headerBg, borderBottomWidth: 1, borderBottomColor: Colors.border }}>
+            <Text className="text-xl font-bold" style={{ color: Colors.text1 }}>학생 일괄 입력</Text>
           </View>
 
           <ScrollView className="flex-1 px-6 pt-4">
@@ -281,10 +293,11 @@ export default function SettingsScreen() {
                 />
               </View>
               <Pressable
-                className={`rounded-xl px-5 items-center justify-center self-end ${
-                  previewCount > 0 ? "bg-primary" : "bg-gray-300"
-                }`}
-                style={{ height: 50 }}
+                className="rounded-xl px-5 items-center justify-center self-end"
+                style={{
+                  height: 50,
+                  backgroundColor: previewCount > 0 ? Colors.primary : Colors.pillBg,
+                }}
                 onPress={handleBatchImport}
                 disabled={previewCount === 0}
               >
@@ -293,23 +306,23 @@ export default function SettingsScreen() {
                 </Text>
               </Pressable>
               <Pressable
-                className="bg-gray-200 rounded-xl px-4 items-center justify-center self-end"
-                style={{ height: 50 }}
+                className="rounded-xl px-4 items-center justify-center self-end"
+                style={{ height: 50, backgroundColor: Colors.surface }}
                 onPress={() => {
                   setShowBatchImport(false);
                   setBatchText("");
                 }}
               >
-                <Text className="text-tablet-sm font-bold text-gray-600">취소</Text>
+                <Text className="text-tablet-sm font-bold" style={{ color: Colors.text2 }}>취소</Text>
               </Pressable>
             </View>
 
             {/* 안내 */}
-            <View className="bg-sky rounded-xl p-4 mb-4">
-              <Text className="text-sm font-bold text-primary mb-1">
+            <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: Colors.primarySoft }}>
+              <Text className="text-sm font-bold mb-1" style={{ color: Colors.primary }}>
                 입력 형식 (한 줄에 한 명)
               </Text>
-              <Text className="text-xs text-primary/70 leading-5">
+              <Text className="text-xs leading-5" style={{ color: 'rgba(59,130,246,0.7)' }}>
                 번호,이름,성별,달리기기록(초){"\n"}
                 {"\n"}
                 예시:{"\n"}
@@ -325,19 +338,28 @@ export default function SettingsScreen() {
 
             {/* 텍스트 입력 */}
             <TextInput
-              className="bg-white border border-gray-300 rounded-xl p-4 text-base mb-4"
-              style={{ minHeight: 200, textAlignVertical: "top" }}
+              className="rounded-xl p-4 text-base mb-4"
+              style={{
+                minHeight: 200,
+                textAlignVertical: "top",
+                backgroundColor: Colors.inputBg,
+                borderWidth: 1,
+                borderColor: Colors.inputBorder,
+                color: Colors.text1,
+              }}
               placeholder={"1,김민수,남,12.15\n2,이서연,여,13.42\n3,박지호,남"}
+              placeholderTextColor={Colors.placeholder}
               value={batchText}
               onChangeText={setBatchText}
               multiline
               autoCorrect={false}
+              keyboardAppearance="dark"
             />
 
             {/* 미리보기 */}
             {batchText.trim().length > 0 && (
-              <View className="bg-gray-100 rounded-xl p-3 mb-4">
-                <Text className="text-sm text-gray-600">
+              <View className="rounded-xl p-3 mb-4" style={{ backgroundColor: Colors.surface }}>
+                <Text className="text-sm" style={{ color: Colors.text2 }}>
                   인식된 학생: {previewCount}명 /{" "}
                   {batchText.split("\n").filter((l) => l.trim()).length}줄
                 </Text>
@@ -356,8 +378,8 @@ export default function SettingsScreen() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row justify-between py-1.5">
-      <Text className="text-sm text-gray-500">{label}</Text>
-      <Text className="text-sm font-bold text-secondary">{value}</Text>
+      <Text className="text-sm" style={{ color: Colors.text2 }}>{label}</Text>
+      <Text className="text-sm font-bold" style={{ color: Colors.text1 }}>{value}</Text>
     </View>
   );
 }

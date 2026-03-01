@@ -4,16 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect } from "react";
 import { useTeamStore } from "@/stores/teamStore";
-
-// 팀 색상 6개 (다양한 색상으로 시각적 구분)
-const TEAM_STYLES = [
-  { bg: "#3B82F6", text: "#FFFFFF", light: "#DBEAFE" }, // 파랑
-  { bg: "#EF4444", text: "#FFFFFF", light: "#FEE2E2" }, // 빨강
-  { bg: "#10B981", text: "#FFFFFF", light: "#D1FAE5" }, // 초록
-  { bg: "#F59E0B", text: "#FFFFFF", light: "#FEF3C7" }, // 앰버
-  { bg: "#8B5CF6", text: "#FFFFFF", light: "#EDE9FE" }, // 보라
-  { bg: "#EC4899", text: "#FFFFFF", light: "#FCE7F3" }, // 핑크
-];
+import { Colors, TEAM_STYLES } from "@/constants/theme";
 
 export default function TeamDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -32,7 +23,7 @@ export default function TeamDetailScreen() {
   // 아이패드: 큰 글씨 5열, 아이폰: 작은 글씨 4열
   const cols = isTablet ? 5 : 4;
   const colWidth = `${Math.floor(100 / cols)}%`;
-  const nameFontSize = isTablet ? 32 : 18;
+  const nameFontSize = isTablet ? 38 : 22;
   const genderFontSize = isTablet ? 16 : 12;
   const headerFontSize = isTablet ? 22 : 16;
   const infoFontSize = isTablet ? 24 : 18;
@@ -40,8 +31,8 @@ export default function TeamDetailScreen() {
 
   if (isLoading || !currentTeam) {
     return (
-      <SafeAreaView className="flex-1 bg-white items-center justify-center">
-        <ActivityIndicator size="large" color="#3B82F6" />
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: Colors.bg }}>
+        <ActivityIndicator size="large" color={Colors.primary} />
       </SafeAreaView>
     );
   }
@@ -54,21 +45,21 @@ export default function TeamDetailScreen() {
   }));
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: Colors.bg }} edges={["bottom"]}>
       <ScrollView className="flex-1 px-6 pt-4">
         {/* 팀 정보 헤더 */}
-        <View className="bg-white rounded-2xl p-5 mb-4 border border-sky">
+        <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.primary }}>
           <View className="flex-row items-center gap-3 flex-wrap">
-            <Text style={{ fontSize: infoFontSize }} className="font-bold text-secondary">
+            <Text style={{ fontSize: infoFontSize, color: Colors.text1 }} className="font-bold">
               {currentTeam.grade}학년 {currentTeam.class}반
             </Text>
-            <View className="bg-sky px-3 py-1.5 rounded-lg">
-              <Text style={{ fontSize: badgeFontSize }} className="font-bold text-primary">
+            <View className="px-3 py-1.5 rounded-lg" style={{ backgroundColor: Colors.primarySoft }}>
+              <Text style={{ fontSize: badgeFontSize, color: Colors.primary }} className="font-bold">
                 {currentTeam.teamCount}팀 · {currentTeam.teamType === "mixed" ? "혼성" : "성별분리"}
               </Text>
             </View>
-            <View className="bg-sky px-3 py-1.5 rounded-lg">
-              <Text style={{ fontSize: badgeFontSize }} className="font-bold text-primary">
+            <View className="px-3 py-1.5 rounded-lg" style={{ backgroundColor: Colors.primarySoft }}>
+              <Text style={{ fontSize: badgeFontSize, color: Colors.primary }} className="font-bold">
                 총 {currentMembers.length}명
               </Text>
             </View>
@@ -82,7 +73,7 @@ export default function TeamDetailScreen() {
           const females = group.members.filter((m) => m.gender === "F").length;
 
           return (
-            <View key={group.name} className="bg-white rounded-2xl mb-4 overflow-hidden">
+            <View key={group.name} className="rounded-2xl mb-4 overflow-hidden" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
               {/* 팀 헤더 — 색상 바 */}
               <View
                 style={{ backgroundColor: style.bg }}
@@ -122,18 +113,18 @@ export default function TeamDetailScreen() {
                     className="p-1"
                   >
                     <View
-                      style={{ backgroundColor: style.light }}
-                      className="rounded-xl py-3 px-1 items-center"
+                      style={{
+                        backgroundColor: m.gender === "M" ? `${style.bg}1F` : `${style.bg}40`,
+                        minHeight: 48,
+                      }}
+                      className="rounded-xl py-2.5 px-2 flex-row items-center justify-center"
                     >
-                      <Text
-                        style={{ fontSize: genderFontSize, color: style.bg }}
-                        className="font-bold"
-                      >
-                        {m.gender === "M" ? "남" : "여"}
+                      <Text style={{ fontSize: nameFontSize * 0.7, marginRight: 4 }}>
+                        {m.gender === "M" ? "👦" : "👧"}
                       </Text>
                       <Text
-                        style={{ fontSize: nameFontSize }}
-                        className="font-bold text-secondary"
+                        style={{ fontSize: nameFontSize, color: Colors.text1 }}
+                        className="font-bold"
                         numberOfLines={1}
                         adjustsFontSizeToFit
                         minimumFontScale={0.7}
@@ -150,12 +141,13 @@ export default function TeamDetailScreen() {
       </ScrollView>
 
       {/* 하단 버튼 */}
-      <View className="px-6 py-4 bg-white border-t border-gray-100">
+      <View className="px-6 py-4" style={{ backgroundColor: Colors.card, borderTopWidth: 1, borderTopColor: Colors.border }}>
         <Pressable
-          className="py-4 rounded-xl bg-sunny items-center active:opacity-80"
+          className="py-4 rounded-xl items-center active:opacity-80"
+          style={{ backgroundColor: Colors.warning }}
           onPress={() => router.push(`/game/scoreboard/${id}`)}
         >
-          <Text style={{ fontSize: isTablet ? 20 : 16 }} className="font-bold text-secondary">
+          <Text style={{ fontSize: isTablet ? 20 : 16, color: Colors.bg }} className="font-bold">
             🏆 점수판
           </Text>
         </Pressable>

@@ -1,5 +1,6 @@
 import { View, Text, Pressable, Modal, FlatList } from "react-native";
 import { useState } from "react";
+import { Colors } from "@/constants/theme";
 
 type Option = { label: string; value: string | number };
 
@@ -16,31 +17,31 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
 
   return (
     <View>
-      <Text className="text-sm text-gray-400 mb-1">{label}</Text>
+      <Text style={{ color: Colors.text3 }} className="text-sm mb-1">{label}</Text>
       <Pressable
-        className="bg-gray-50 rounded-2xl px-4 py-3 active:opacity-80"
+        className="rounded-2xl px-4 py-3 active:opacity-80"
+        style={{ backgroundColor: Colors.surface }}
         onPress={() => setOpen(true)}
       >
-        <Text className="text-tablet-sm text-secondary font-medium">
+        <Text className="text-tablet-sm font-medium" style={{ color: Colors.text1 }}>
           {selected?.label ?? "선택"}
         </Text>
       </Pressable>
       <Modal visible={open} transparent animationType="fade">
         <Pressable
-          className="flex-1 bg-black/40 justify-center items-center"
+          className="flex-1 justify-center items-center"
+          style={{ backgroundColor: Colors.overlay }}
           onPress={() => setOpen(false)}
         >
           <View
-            className="bg-white rounded-3xl w-[300px] max-h-[400px] p-5"
+            className="rounded-3xl w-[300px] max-h-[400px] p-5"
             style={{
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.15,
-              shadowRadius: 24,
-              elevation: 8,
+              backgroundColor: Colors.card,
+              borderWidth: 1,
+              borderColor: Colors.border,
             }}
           >
-            <Text className="text-tablet-md font-bold text-secondary mb-4">
+            <Text className="text-tablet-md font-bold mb-4" style={{ color: Colors.text1 }}>
               {label}
             </Text>
             <FlatList
@@ -48,9 +49,8 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
               keyExtractor={(item) => String(item.value)}
               renderItem={({ item }) => (
                 <Pressable
-                  className={`py-3 px-4 rounded-2xl mb-1 ${
-                    item.value === value ? "bg-blue-50" : ""
-                  }`}
+                  className="py-3 px-4 rounded-2xl mb-1"
+                  style={item.value === value ? { backgroundColor: Colors.primarySoft } : undefined}
                   onPress={() => {
                     onSelect(item.value);
                     setOpen(false);
@@ -58,10 +58,9 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
                 >
                   <Text
                     className={`text-tablet-sm ${
-                      item.value === value
-                        ? "text-primary font-bold"
-                        : "text-secondary"
+                      item.value === value ? "font-bold" : ""
                     }`}
+                    style={{ color: item.value === value ? Colors.primary : Colors.text1 }}
                   >
                     {item.label}
                   </Text>

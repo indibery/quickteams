@@ -5,6 +5,7 @@ import {
   Alert,
   Modal,
   TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
@@ -14,16 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { useTeamStore } from "@/stores/teamStore";
 import { insertGameRecord } from "@/lib/db/repositories/gameRepository";
-
-// 점수판 팀 색상 (다양한 색상으로 시각적 구분)
-const TEAM_COLORS = [
-  { bg: "#3B82F6", text: "#FFFFFF" }, // 파랑
-  { bg: "#EF4444", text: "#FFFFFF" }, // 빨강
-  { bg: "#10B981", text: "#FFFFFF" }, // 초록
-  { bg: "#F59E0B", text: "#FFFFFF" }, // 앰버
-  { bg: "#8B5CF6", text: "#FFFFFF" }, // 보라
-  { bg: "#EC4899", text: "#FFFFFF" }, // 핑크
-];
+import { Colors, TEAM_COLORS } from "@/constants/theme";
 
 const SPORT_OPTIONS = ["피구", "티볼", "축구"];
 
@@ -33,6 +25,9 @@ export default function ScoreboardScreen() {
   const router = useRouter();
   const { currentTeam, currentMembers, loadTeamDetail } = useTeamStore();
   const insets = useSafeAreaInsets();
+
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
 
   const [scores, setScores] = useState<number[]>([]);
   const [showControls, setShowControls] = useState(true);
@@ -123,6 +118,12 @@ export default function ScoreboardScreen() {
   const isTwo = teamCount === 2;
   const isMany = teamCount >= 5; // 5~6팀: 3열×2행
 
+  // iPad: 점수 폰트 더 크게
+  const scoreFontSize = isMany ? 80 : isTablet ? 200 : 140;
+  const nameFontSize = isMany ? 28 : isTablet ? 56 : 48;
+  const btnSize = isMany ? (isTablet ? "w-18 h-18" : "w-14 h-14") : (isTablet ? "w-24 h-24" : "w-20 h-20");
+  const btnTextSize = isMany ? "text-2xl" : (isTablet ? "text-5xl" : "text-4xl");
+
   return (
     <View className="flex-1 bg-black">
       <StatusBar hidden />
@@ -133,44 +134,51 @@ export default function ScoreboardScreen() {
           className="bg-black/80 px-4 pb-2 flex-row items-center justify-between"
           style={{ paddingTop: insets.top + 4 }}
         >
-          <View className="flex-row gap-2">
+          <View className="flex-row gap-3">
             <Pressable
-              className="px-4 py-2 rounded-full bg-white/20"
+              className="rounded-xl items-center justify-center active:opacity-80"
+              style={{ backgroundColor: 'rgba(255,255,255,0.12)', height: isTablet ? 48 : 44, paddingHorizontal: isTablet ? 20 : 16 }}
               onPress={() => router.back()}
             >
-              <Text className="text-white text-sm">← 나가기</Text>
+              <Text className="text-white font-semibold" style={{ fontSize: isTablet ? 18 : 16 }}>← 나가기</Text>
             </Pressable>
             <Pressable
-              className="px-4 py-2 rounded-full bg-white/20"
+              className="rounded-xl items-center justify-center active:opacity-80"
+              style={{ backgroundColor: 'rgba(255,255,255,0.12)', height: isTablet ? 48 : 44, paddingHorizontal: isTablet ? 20 : 16 }}
               onPress={resetScores}
             >
-              <Text className="text-white text-sm">↻ 초기화</Text>
+              <Text className="text-white font-semibold" style={{ fontSize: isTablet ? 18 : 16 }}>↻ 초기화</Text>
             </Pressable>
             <Pressable
-              className={`px-4 py-2 rounded-full ${
-                hasScores && savedGameId == null
-                  ? "bg-green-500/80"
-                  : "bg-white/10"
-              }`}
+              className="rounded-xl items-center justify-center active:opacity-80"
+              style={{
+                backgroundColor: hasScores && savedGameId == null
+                  ? 'rgba(16,185,129,0.8)'
+                  : 'rgba(255,255,255,0.08)',
+                height: isTablet ? 48 : 44,
+                paddingHorizontal: isTablet ? 20 : 16,
+              }}
               onPress={handleSave}
               disabled={!hasScores}
             >
               <Text
-                className={`text-sm ${
+                className={`font-semibold ${
                   hasScores && savedGameId == null
-                    ? "text-white font-bold"
+                    ? "text-white"
                     : "text-white/40"
                 }`}
+                style={{ fontSize: isTablet ? 18 : 16 }}
               >
                 {savedGameId != null ? "✓ 저장됨" : "💾 저장"}
               </Text>
             </Pressable>
           </View>
           <Pressable
-            className="w-10 h-10 rounded-full bg-white/20 items-center justify-center"
+            className="rounded-xl items-center justify-center"
+            style={{ backgroundColor: 'rgba(255,255,255,0.12)', width: isTablet ? 48 : 44, height: isTablet ? 48 : 44 }}
             onPress={() => setShowControls(false)}
           >
-            <Text className="text-white text-lg">✕</Text>
+            <Text className="text-white" style={{ fontSize: isTablet ? 22 : 20 }}>✕</Text>
           </Pressable>
         </View>
       )}
@@ -201,13 +209,13 @@ export default function ScoreboardScreen() {
               }`}
             >
               <Text
-                style={{ color: color.text, fontSize: isMany ? 28 : 48 }}
+                style={{ color: color.text, fontSize: nameFontSize }}
                 className="font-bold opacity-80"
               >
                 {name}
               </Text>
               <Text
-                style={{ color: color.text, fontSize: isMany ? 80 : 140 }}
+                style={{ color: color.text, fontSize: scoreFontSize }}
                 className="font-bold my-2"
               >
                 {score}
@@ -215,23 +223,23 @@ export default function ScoreboardScreen() {
               {showControls && (
                 <View className={`flex-row ${isMany ? "gap-3" : "gap-6"}`}>
                   <Pressable
-                    className={`${isMany ? "w-14 h-14" : "w-20 h-20"} rounded-full bg-black/20 items-center justify-center active:bg-black/40`}
+                    className={`${btnSize} rounded-full bg-black/20 items-center justify-center active:bg-black/40`}
                     onPress={() => updateScore(i, -1)}
                   >
                     <Text
                       style={{ color: color.text }}
-                      className={`${isMany ? "text-2xl" : "text-4xl"} font-bold`}
+                      className={`${btnTextSize} font-bold`}
                     >
                       −
                     </Text>
                   </Pressable>
                   <Pressable
-                    className={`${isMany ? "w-14 h-14" : "w-20 h-20"} rounded-full bg-white/30 items-center justify-center active:bg-white/50`}
+                    className={`${btnSize} rounded-full bg-white/30 items-center justify-center active:bg-white/50`}
                     onPress={() => updateScore(i, 1)}
                   >
                     <Text
                       style={{ color: color.text }}
-                      className={`${isMany ? "text-2xl" : "text-4xl"} font-bold`}
+                      className={`${btnTextSize} font-bold`}
                     >
                       +
                     </Text>
@@ -243,7 +251,7 @@ export default function ScoreboardScreen() {
         })}
       </View>
 
-      {/* 종목 선택 모달 (크로스 플랫폼) */}
+      {/* 종목 선택 모달 */}
       <Modal
         visible={showSportPicker}
         transparent
@@ -251,21 +259,26 @@ export default function ScoreboardScreen() {
         onRequestClose={() => setShowSportPicker(false)}
       >
         <Pressable
-          className="flex-1 bg-black/50 items-center justify-center"
+          className="flex-1 items-center justify-center"
+          style={{ backgroundColor: Colors.overlay }}
           onPress={() => setShowSportPicker(false)}
         >
-          <Pressable className="bg-white rounded-2xl p-6 w-80">
-            <Text className="text-lg font-bold text-center mb-4">
+          <Pressable
+            className="rounded-2xl p-6 w-80"
+            style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
+          >
+            <Text className="text-lg font-bold text-center mb-4" style={{ color: Colors.text1 }}>
               경기 종목 선택
             </Text>
 
             {SPORT_OPTIONS.map((sport) => (
               <Pressable
                 key={sport}
-                className="py-3 px-4 rounded-xl bg-gray-100 mb-2 active:bg-gray-200"
+                className="py-3 px-4 rounded-xl mb-2 active:opacity-80"
+                style={{ backgroundColor: Colors.surface }}
                 onPress={() => saveGameRecord(sport)}
               >
-                <Text className="text-base font-bold text-center text-gray-800">
+                <Text className="text-base font-bold text-center" style={{ color: Colors.text1 }}>
                   {sport}
                 </Text>
               </Pressable>
@@ -274,24 +287,27 @@ export default function ScoreboardScreen() {
             {/* 직접 입력 */}
             <View className="flex-row gap-2 mt-2">
               <TextInput
-                className="flex-1 border border-gray-300 rounded-xl px-3 py-2.5 text-base"
+                className="flex-1 rounded-xl px-3 py-2.5 text-base"
+                style={{ backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.inputBorder, color: Colors.text1 }}
                 placeholder="직접 입력"
+                placeholderTextColor={Colors.placeholder}
+                keyboardAppearance="dark"
                 value={customSport}
                 onChangeText={setCustomSport}
               />
               <Pressable
-                className={`px-4 rounded-xl items-center justify-center ${
-                  customSport.trim() ? "bg-primary" : "bg-gray-200"
-                }`}
+                className="px-4 rounded-xl items-center justify-center"
+                style={{
+                  backgroundColor: customSport.trim() ? Colors.primary : Colors.pillBg,
+                }}
                 onPress={() => {
                   if (customSport.trim()) saveGameRecord(customSport.trim());
                 }}
                 disabled={!customSport.trim()}
               >
                 <Text
-                  className={`text-sm font-bold ${
-                    customSport.trim() ? "text-white" : "text-gray-400"
-                  }`}
+                  className="text-sm font-bold"
+                  style={{ color: customSport.trim() ? '#fff' : Colors.text3 }}
                 >
                   저장
                 </Text>
@@ -305,7 +321,7 @@ export default function ScoreboardScreen() {
                 setCustomSport("");
               }}
             >
-              <Text className="text-center text-gray-400">취소</Text>
+              <Text className="text-center" style={{ color: Colors.text2 }}>취소</Text>
             </Pressable>
           </Pressable>
         </Pressable>

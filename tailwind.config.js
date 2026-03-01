@@ -21,6 +21,13 @@ module.exports = {
         team4: "#F59E0B",      // 팀4 - 앰버
         team5: "#8B5CF6",      // 팀5 - 보라
         team6: "#EC4899",      // 팀6 - 핑크
+        // 다크 테마 토큰
+        "dark-bg": "#0d1117",
+        "dark-card": "#161b22",
+        "dark-border": "#21262d",
+        "dark-text1": "#e6edf3",
+        "dark-text2": "#8b949e",
+        "dark-text3": "#4b5563",
       },
       fontSize: {
         "score-xl": ["120px", { lineHeight: "1" }],

@@ -12,6 +12,8 @@ import { useRouter } from "expo-router";
 import { useTeamStore } from "@/stores/teamStore";
 import type { Team } from "@/lib/types";
 import PickerSelect from "@/components/common/PickerSelect";
+import { Colors } from "@/constants/theme";
+import AnimatedCard from "@/components/common/AnimatedCard";
 
 const gradeOptions = [
   { label: "전체", value: 0 },
@@ -35,56 +37,46 @@ export default function TeamsListScreen() {
     }
   }, [grade]);
 
-  const renderTeam = ({ item }: { item: Team }) => (
+  const renderTeam = ({ item, index }: { item: Team; index: number }) => (
+    <AnimatedCard index={index}>
     <Pressable
-      className="bg-white rounded-2xl p-5 mb-3 active:scale-[0.98]"
-      style={{
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 1,
-      }}
+      className="rounded-2xl p-5 mb-3 active:scale-[0.98]"
+      style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
       onPress={() => router.push(`/teams/${item.id}`)}
     >
       <View className="flex-row items-center">
         <View className="flex-1 flex-row items-center gap-3 flex-wrap">
-          <Text style={{ fontSize: 24 }} className="font-bold text-secondary">
+          <Text style={{ fontSize: 24, color: Colors.text1 }} className="font-bold">
             {item.grade}학년 {item.class}반
           </Text>
-          <View className="bg-blue-50 px-3 py-1 rounded-xl">
-            <Text style={{ fontSize: 18 }} className="font-bold text-primary">
+          <View className="px-3 py-1 rounded-xl" style={{ backgroundColor: Colors.primarySoft }}>
+            <Text style={{ fontSize: 18, color: Colors.primary }} className="font-bold">
               {item.teamCount}팀 · {item.teamType === "mixed" ? "혼성" : "성별분리"}
             </Text>
           </View>
           {item.label ? (
-            <View className="bg-amber-50 px-2.5 py-0.5 rounded-xl">
-              <Text style={{ fontSize: 14 }} className="font-bold text-secondary">
+            <View className="px-2.5 py-0.5 rounded-xl" style={{ backgroundColor: Colors.warningSoft }}>
+              <Text style={{ fontSize: 14, color: Colors.warningText }} className="font-bold">
                 {item.label}
               </Text>
             </View>
           ) : null}
-          <Text className="text-xs text-gray-300">
+          <Text className="text-xs" style={{ color: Colors.text3 }}>
             {item.createdAt.split(" ")[0]}
           </Text>
         </View>
-        <Text className="text-gray-300 text-xl">›</Text>
+        <Text className="text-xl" style={{ color: Colors.text3 }}>›</Text>
       </View>
     </Pressable>
+    </AnimatedCard>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: Colors.bg }} edges={["bottom"]}>
       {/* 필터 */}
       <View
-        className="bg-white px-6 py-3 flex-row gap-3"
-        style={{
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.04,
-          shadowRadius: 3,
-          elevation: 1,
-        }}
+        className="px-6 py-3 flex-row gap-3"
+        style={{ backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border }}
       >
         <View className="flex-1">
           <PickerSelect
@@ -97,21 +89,21 @@ export default function TeamsListScreen() {
       </View>
 
       <View className="px-6 py-2.5">
-        <Text className="text-sm text-gray-400">
+        <Text className="text-sm" style={{ color: Colors.text2 }}>
           {grade === 0 ? "전체" : `${grade}학년`} · {teams.length}개 팀
         </Text>
       </View>
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#3B82F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : teams.length === 0 ? (
         <View className="flex-1 items-center justify-center">
-          <View className="bg-gray-100 w-20 h-20 rounded-3xl items-center justify-center mb-4">
+          <View className="w-20 h-20 rounded-3xl items-center justify-center mb-4" style={{ backgroundColor: Colors.surface }}>
             <Text style={{ fontSize: 36 }}>📋</Text>
           </View>
-          <Text className="text-tablet-sm text-gray-400">
+          <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>
             저장된 팀이 없습니다
           </Text>
           <Pressable

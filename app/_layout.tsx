@@ -5,6 +5,7 @@ import { SQLiteProvider } from "expo-sqlite";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { migrateDbIfNeeded } from "@/lib/db/database";
+import { Colors } from "@/constants/theme";
 
 function AppContent() {
   return (
@@ -12,10 +13,12 @@ function AppContent() {
       <StatusBar style="light" />
       <Stack
           screenOptions={{
-            headerStyle: { backgroundColor: "#3B82F6" },
-            headerTintColor: "#fff",
-            headerTitleStyle: { fontWeight: "bold", fontSize: 20 },
+            headerStyle: { backgroundColor: Colors.headerBg },
+            headerTintColor: Colors.headerTint,
+            headerTitleStyle: { fontWeight: "bold", fontSize: 20, color: Colors.text1 },
             headerShadowVisible: false,
+            headerBackTitle: '바로팀',
+            contentStyle: { backgroundColor: Colors.bg },
           }}
         >
           <Stack.Screen

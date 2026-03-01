@@ -14,6 +14,8 @@ import { useStudentStore } from "@/stores/studentStore";
 import type { Student, StudentInput } from "@/lib/types";
 import StudentForm from "@/components/students/StudentForm";
 import PickerSelect from "@/components/common/PickerSelect";
+import { Colors } from "@/constants/theme";
+import AnimatedCard from "@/components/common/AnimatedCard";
 
 const gradeOptions = Array.from({ length: 6 }, (_, i) => ({
   label: `${i + 1}학년`,
@@ -116,23 +118,17 @@ export default function StudentsScreen() {
     );
   };
 
-  const renderStudent = ({ item }: { item: Student }) => (
+  const renderStudent = ({ item, index }: { item: Student; index: number }) => (
+    <AnimatedCard index={index}>
     <Pressable
-      className="bg-white rounded-2xl p-4 mb-2.5 flex-row items-center active:opacity-80"
-      style={{
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 1,
-      }}
+      className="rounded-2xl p-4 mb-2.5 flex-row items-center active:opacity-80"
+      style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
       onPress={() => setEditingStudent(item)}
     >
       {/* 성별 아이콘 */}
       <View
-        className={`w-11 h-11 rounded-xl items-center justify-center mr-3 ${
-          item.gender === "M" ? "bg-blue-50" : "bg-amber-50"
-        }`}
+        className="w-11 h-11 rounded-xl items-center justify-center mr-3"
+        style={{ backgroundColor: item.gender === "M" ? Colors.male : Colors.female }}
       >
         <Text style={{ fontSize: 22 }}>
           {item.gender === "M" ? "👦" : "👧"}
@@ -141,22 +137,22 @@ export default function StudentsScreen() {
 
       {/* 학생 정보 */}
       <View className="flex-1">
-        <Text className="text-tablet-sm font-bold text-secondary">
+        <Text className="text-tablet-sm font-bold" style={{ color: Colors.text1 }}>
           {item.studentNumber}번 {item.name}
         </Text>
         <View className="flex-row gap-2 mt-1">
           {item.runningRecord && (
-            <Text className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-lg">
+            <Text className="text-xs px-2 py-0.5 rounded-lg" style={{ color: Colors.text2, backgroundColor: Colors.surface }}>
               🏃 {item.runningRecord}초
             </Text>
           )}
           {item.adjustment !== 0 && (
             <Text
-              className={`text-xs px-2 py-0.5 rounded-lg font-bold ${
-                item.adjustment > 0
-                  ? "text-primary bg-blue-50"
-                  : "text-amber-600 bg-amber-50"
-              }`}
+              className="text-xs px-2 py-0.5 rounded-lg font-bold"
+              style={{
+                color: item.adjustment > 0 ? Colors.primary : Colors.warningText,
+                backgroundColor: item.adjustment > 0 ? Colors.primarySoft : Colors.warningSoft,
+              }}
             >
               능력 보정 {item.adjustment > 0 ? `+${item.adjustment}` : item.adjustment}
             </Text>
@@ -166,9 +162,9 @@ export default function StudentsScreen() {
 
       {/* 능력 점수 */}
       {item.abilityScore != null && (
-        <View className="bg-blue-50 rounded-xl px-3 py-1.5 mr-2">
-          <Text className="text-xs text-gray-400">능력</Text>
-          <Text className="text-tablet-sm font-bold text-primary">
+        <View className="rounded-xl px-3 py-1.5 mr-2" style={{ backgroundColor: Colors.primarySoft }}>
+          <Text className="text-xs" style={{ color: Colors.text3 }}>능력</Text>
+          <Text className="text-tablet-sm font-bold" style={{ color: Colors.primary }}>
             {item.abilityScore.toFixed(1)}
           </Text>
         </View>
@@ -176,27 +172,23 @@ export default function StudentsScreen() {
 
       {/* 개별 삭제 버튼 */}
       <Pressable
-        className="w-9 h-9 rounded-xl bg-red-50 items-center justify-center active:bg-red-100"
+        className="w-9 h-9 rounded-xl items-center justify-center active:opacity-80"
+        style={{ backgroundColor: Colors.dangerSoft }}
         onPress={() => handleDelete(item)}
         hitSlop={8}
       >
         <Text style={{ fontSize: 16 }}>🗑️</Text>
       </Pressable>
     </Pressable>
+    </AnimatedCard>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50" edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: Colors.bg }} edges={["bottom"]}>
       {/* 필터 영역 */}
       <View
-        className="bg-white px-6 py-3 flex-row gap-3"
-        style={{
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.04,
-          shadowRadius: 3,
-          elevation: 1,
-        }}
+        className="px-6 py-3 flex-row gap-3"
+        style={{ backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border }}
       >
         <View className="flex-1">
           <PickerSelect
@@ -224,17 +216,17 @@ export default function StudentsScreen() {
         </Pressable>
         {/* 학급 전체 삭제 */}
         <Pressable
-          className="bg-red-50 rounded-2xl px-4 items-center justify-center self-end active:opacity-80"
-          style={{ height: 50 }}
+          className="rounded-2xl px-4 items-center justify-center self-end active:opacity-80"
+          style={{ height: 50, backgroundColor: Colors.dangerSoft }}
           onPress={handleDeleteClass}
         >
-          <Text className="text-red-500 text-tablet-sm font-bold">학급 삭제</Text>
+          <Text className="text-tablet-sm font-bold" style={{ color: Colors.dangerText }}>학급 삭제</Text>
         </Pressable>
       </View>
 
       {/* 학생 수 */}
       <View className="px-6 py-2.5">
-        <Text className="text-sm text-gray-400">
+        <Text className="text-sm" style={{ color: Colors.text2 }}>
           {selectedGrade}학년 {selectedClass}반 · {students.length}명
         </Text>
       </View>
@@ -242,14 +234,14 @@ export default function StudentsScreen() {
       {/* 목록 */}
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#3B82F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : students.length === 0 ? (
         <View className="flex-1 items-center justify-center">
-          <View className="bg-gray-100 w-20 h-20 rounded-3xl items-center justify-center mb-4">
+          <View className="w-20 h-20 rounded-3xl items-center justify-center mb-4" style={{ backgroundColor: Colors.surface }}>
             <Text style={{ fontSize: 36 }}>📝</Text>
           </View>
-          <Text className="text-tablet-sm text-gray-400">
+          <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>
             학생을 추가해주세요
           </Text>
         </View>
@@ -264,9 +256,9 @@ export default function StudentsScreen() {
 
       {/* 추가 모달 */}
       <Modal visible={showForm} animationType="slide">
-        <View className="flex-1" style={{ paddingTop: insets.top }}>
-          <View className="bg-primary px-6 py-4">
-            <Text className="text-xl font-bold text-white">학생 추가</Text>
+        <View className="flex-1" style={{ backgroundColor: Colors.bg, paddingTop: insets.top }}>
+          <View className="px-6 py-4" style={{ backgroundColor: Colors.headerBg, borderBottomWidth: 1, borderBottomColor: Colors.border }}>
+            <Text className="text-xl font-bold" style={{ color: Colors.text1 }}>학생 추가</Text>
           </View>
           <StudentForm
             defaultGrade={selectedGrade}
@@ -279,9 +271,9 @@ export default function StudentsScreen() {
 
       {/* 편집 모달 */}
       <Modal visible={editingStudent != null} animationType="slide">
-        <View className="flex-1" style={{ paddingTop: insets.top }}>
-          <View className="bg-primary px-6 py-4">
-            <Text className="text-xl font-bold text-white">학생 편집</Text>
+        <View className="flex-1" style={{ backgroundColor: Colors.bg, paddingTop: insets.top }}>
+          <View className="px-6 py-4" style={{ backgroundColor: Colors.headerBg, borderBottomWidth: 1, borderBottomColor: Colors.border }}>
+            <Text className="text-xl font-bold" style={{ color: Colors.text1 }}>학생 편집</Text>
           </View>
           {editingStudent && (
             <StudentForm
