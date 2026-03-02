@@ -13,8 +13,6 @@ import { useTeamStore } from "@/stores/teamStore";
 import type { Team } from "@/lib/types";
 import PickerSelect from "@/components/common/PickerSelect";
 import { Colors } from "@/constants/theme";
-import AnimatedCard from "@/components/common/AnimatedCard";
-
 const gradeOptions = [
   { label: "전체", value: 0 },
   ...Array.from({ length: 6 }, (_, i) => ({
@@ -37,8 +35,7 @@ export default function TeamsListScreen() {
     }
   }, [grade]);
 
-  const renderTeam = ({ item, index }: { item: Team; index: number }) => (
-    <AnimatedCard index={index}>
+  const renderTeam = ({ item }: { item: Team }) => (
     <Pressable
       className="rounded-2xl p-5 mb-3 active:scale-[0.98]"
       style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
@@ -68,7 +65,6 @@ export default function TeamsListScreen() {
         <Text className="text-xl" style={{ color: Colors.text3 }}>›</Text>
       </View>
     </Pressable>
-    </AnimatedCard>
   );
 
   return (

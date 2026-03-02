@@ -16,8 +16,8 @@ function AppContent() {
             headerStyle: { backgroundColor: Colors.headerBg },
             headerTintColor: Colors.headerTint,
             headerTitleStyle: { fontWeight: "bold", fontSize: 20, color: Colors.text1 },
+            headerBackTitle: "바로팀",
             headerShadowVisible: false,
-            headerBackTitle: '바로팀',
             contentStyle: { backgroundColor: Colors.bg },
           }}
         >

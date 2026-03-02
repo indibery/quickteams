@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, useWindowDimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -59,98 +59,134 @@ const settingsItem: MenuItem = {
 
 export default function MainScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+
+  // iPad: 더 큰 아이콘·폰트·패딩
+  const iconSize = isTablet ? 72 : 48;
+  const iconFontSize = isTablet ? 36 : 24;
+  const iconRadius = isTablet ? 20 : 16;
+  const cardPadding = isTablet ? 28 : 20;
+  const titleSize = isTablet ? 24 : 20;
+  const subtitleSize = isTablet ? 16 : 14;
+  const settingsIconMr = isTablet ? 20 : 16;
+  const headerSize = isTablet ? 64 : 36;
+  const headerLineHeight = isTablet ? 76 : 44;
+  const labelSize = isTablet ? 20 : 12;
+  const sloganSize = isTablet ? 22 : 14;
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor: Colors.bg }}>
-      <View className="flex-1 px-6 pt-6">
-        {/* 헤더 */}
-        <Text
-          className="text-xs font-semibold tracking-widest mb-2"
-          style={{ color: Colors.text3, letterSpacing: 2 }}
-        >
-          SPORTS TEAM MAKER
-        </Text>
-        <Text style={{ fontSize: 36, lineHeight: 44 }} className="font-black mb-2">
-          <Text style={{ color: Colors.text1 }}>바로</Text>
-          <Text style={{ color: Colors.primary }}>팀</Text>
-        </Text>
-        <Text className="text-tablet-sm mb-8" style={{ color: Colors.text2 }}>
-          달리기 기록으로 공정하게 팀을 만들어요
-        </Text>
-
-        {/* 섹션 라벨 */}
-        <Text
-          className="text-sm font-semibold mb-4"
-          style={{ color: Colors.text3, letterSpacing: 1 }}
-        >
-          빠른 시작
-        </Text>
-
-        {/* 2×2 그리드 */}
-        <View className="flex-row flex-wrap gap-4 mb-4">
-          {gridItems.map((item, index) => (
-            <Animated.View
-              key={item.href}
-              entering={FadeInDown.delay(index * 100).duration(400).springify()}
-              className="flex-1 basis-[45%] min-w-[140px]"
-            >
-              <Pressable
-                className="rounded-2xl p-5 active:scale-[0.97]"
-                style={{
-                  backgroundColor: Colors.card,
-                  borderWidth: 1,
-                  borderColor: Colors.border,
-                  ...accentLine(item.accent),
-                }}
-                onPress={() => router.push(item.href as any)}
-              >
-                <View
-                  className="w-12 h-12 rounded-2xl items-center justify-center mb-4"
-                  style={{ backgroundColor: item.iconBg }}
-                >
-                  <Text style={{ fontSize: 24 }}>{item.emoji}</Text>
-                </View>
-                <Text className="text-tablet-md font-bold" style={{ color: Colors.text1 }}>
-                  {item.title}
-                </Text>
-                <Text className="text-sm mt-1" style={{ color: Colors.text2 }}>
-                  {item.subtitle}
-                </Text>
-              </Pressable>
-            </Animated.View>
-          ))}
-        </View>
-
-        {/* 설정 카드 — 가로 레이아웃 */}
-        <Animated.View
-          entering={FadeInDown.delay(400).duration(400).springify()}
-        >
-          <Pressable
-            className="rounded-2xl px-5 py-4 flex-row items-center active:scale-[0.97]"
-            style={{
-              backgroundColor: Colors.card,
-              borderWidth: 1,
-              borderColor: Colors.border,
-              ...accentLine(settingsItem.accent),
-            }}
-            onPress={() => router.push(settingsItem.href as any)}
+      <View
+        className="flex-1 px-6"
+        style={{ paddingTop: isTablet ? 48 : 24 }}
+      >
+        {/* iPad: 중앙 정렬 + maxWidth */}
+        <View style={isTablet ? { maxWidth: 600, alignSelf: "center", width: "100%" } : undefined}>
+          {/* 헤더 */}
+          <Text
+            className="font-semibold tracking-widest mb-2"
+            style={{ color: Colors.text3, letterSpacing: 2, fontSize: labelSize }}
           >
-            <View
-              className="w-12 h-12 rounded-2xl items-center justify-center mr-4"
-              style={{ backgroundColor: settingsItem.iconBg }}
+            SPORTS TEAM MAKER
+          </Text>
+          <Text style={{ fontSize: headerSize, lineHeight: headerLineHeight }} className="font-black mb-2">
+            <Text style={{ color: Colors.text1 }}>바로</Text>
+            <Text style={{ color: Colors.primary }}>팀</Text>
+          </Text>
+          <Text style={{ color: Colors.text2, fontSize: sloganSize, marginBottom: isTablet ? 48 : 32 }}>
+            달리기 기록으로 공정하게 팀을 만들어요
+          </Text>
+
+          {/* 섹션 라벨 */}
+          <Text
+            className="font-semibold mb-4"
+            style={{ color: Colors.text3, letterSpacing: 1, fontSize: isTablet ? 20 : 14 }}
+          >
+            빠른 시작
+          </Text>
+
+          {/* 2×2 그리드 */}
+          <View className="flex-row flex-wrap gap-4 mb-4">
+            {gridItems.map((item, index) => (
+              <Animated.View
+                key={item.href}
+                entering={FadeInDown.delay(index * 100).duration(400).springify()}
+                className="flex-1 basis-[45%] min-w-[140px]"
+              >
+                <Pressable
+                  className="rounded-2xl active:scale-[0.97]"
+                  style={{
+                    backgroundColor: Colors.card,
+                    borderWidth: 1,
+                    borderColor: Colors.border,
+                    padding: cardPadding,
+                    ...accentLine(item.accent),
+                  }}
+                  onPress={() => router.push(item.href as any)}
+                >
+                  <View
+                    className="items-center justify-center"
+                    style={{
+                      width: iconSize,
+                      height: iconSize,
+                      borderRadius: iconRadius,
+                      backgroundColor: item.iconBg,
+                      marginBottom: isTablet ? 20 : 16,
+                    }}
+                  >
+                    <Text style={{ fontSize: iconFontSize }}>{item.emoji}</Text>
+                  </View>
+                  <Text className="font-bold" style={{ color: Colors.text1, fontSize: titleSize }}>
+                    {item.title}
+                  </Text>
+                  <Text style={{ color: Colors.text2, fontSize: subtitleSize, marginTop: 4 }}>
+                    {item.subtitle}
+                  </Text>
+                </Pressable>
+              </Animated.View>
+            ))}
+          </View>
+
+          {/* 설정 카드 — 가로 레이아웃 */}
+          <Animated.View
+            entering={FadeInDown.delay(400).duration(400).springify()}
+          >
+            <Pressable
+              className="rounded-2xl flex-row items-center active:scale-[0.97]"
+              style={{
+                backgroundColor: Colors.card,
+                borderWidth: 1,
+                borderColor: Colors.border,
+                paddingHorizontal: cardPadding,
+                paddingVertical: isTablet ? 20 : 16,
+                ...accentLine(settingsItem.accent),
+              }}
+              onPress={() => router.push(settingsItem.href as any)}
             >
-              <Text style={{ fontSize: 24 }}>{settingsItem.emoji}</Text>
-            </View>
-            <View>
-              <Text className="text-tablet-md font-bold" style={{ color: Colors.text1 }}>
-                {settingsItem.title}
-              </Text>
-              <Text className="text-sm mt-0.5" style={{ color: Colors.text2 }}>
-                {settingsItem.subtitle}
-              </Text>
-            </View>
-          </Pressable>
-        </Animated.View>
+              <View
+                className="items-center justify-center"
+                style={{
+                  width: iconSize,
+                  height: iconSize,
+                  borderRadius: iconRadius,
+                  backgroundColor: settingsItem.iconBg,
+                  marginRight: settingsIconMr,
+                }}
+              >
+                <Text style={{ fontSize: iconFontSize }}>{settingsItem.emoji}</Text>
+              </View>
+              <View>
+                <Text className="font-bold" style={{ color: Colors.text1, fontSize: titleSize }}>
+                  {settingsItem.title}
+                </Text>
+                <Text style={{ color: Colors.text2, fontSize: subtitleSize, marginTop: 2 }}>
+                  {settingsItem.subtitle}
+                </Text>
+              </View>
+            </Pressable>
+          </Animated.View>
+        </View>
       </View>
     </SafeAreaView>
   );

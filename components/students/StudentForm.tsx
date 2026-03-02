@@ -56,11 +56,19 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
       {/* 이름 */}
       <Text className="text-sm mb-1" style={{ color: Colors.text2 }}>이름 *</Text>
       <TextInput
-        className="rounded-xl px-4 py-3 text-tablet-sm mb-4"
-        style={{ backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.inputBorder, color: Colors.text1 }}
+        style={{
+          backgroundColor: Colors.inputBg,
+          borderWidth: 1,
+          borderColor: Colors.inputBorder,
+          color: Colors.text1,
+          borderRadius: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          fontSize: 18,
+          marginBottom: 16,
+        }}
         placeholder="학생 이름"
         placeholderTextColor={Colors.placeholder}
-        keyboardAppearance="dark"
         value={name}
         onChangeText={setName}
       />
@@ -88,11 +96,19 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
       {/* 번호 */}
       <Text className="text-sm mb-1" style={{ color: Colors.text2 }}>번호 *</Text>
       <TextInput
-        className="rounded-xl px-4 py-3 text-tablet-sm mb-4"
-        style={{ backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.inputBorder, color: Colors.text1 }}
+        style={{
+          backgroundColor: Colors.inputBg,
+          borderWidth: 1,
+          borderColor: Colors.inputBorder,
+          color: Colors.text1,
+          borderRadius: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          fontSize: 18,
+          marginBottom: 16,
+        }}
         placeholder="출석 번호"
         placeholderTextColor={Colors.placeholder}
-        keyboardAppearance="dark"
         value={studentNumber}
         onChangeText={setStudentNumber}
         keyboardType="number-pad"
@@ -137,11 +153,19 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
       {/* 달리기 기록 */}
       <Text className="text-sm mb-1" style={{ color: Colors.text2 }}>달리기 기록 (초)</Text>
       <TextInput
-        className="rounded-xl px-4 py-3 text-tablet-sm mb-4"
-        style={{ backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.inputBorder, color: Colors.text1 }}
+        style={{
+          backgroundColor: Colors.inputBg,
+          borderWidth: 1,
+          borderColor: Colors.inputBorder,
+          color: Colors.text1,
+          borderRadius: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          fontSize: 18,
+          marginBottom: 16,
+        }}
         placeholder="예: 12.15"
         placeholderTextColor={Colors.placeholder}
-        keyboardAppearance="dark"
         value={runningRecord}
         onChangeText={setRunningRecord}
         keyboardType="decimal-pad"
@@ -187,14 +211,12 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           <Text className="text-tablet-sm font-bold" style={{ color: Colors.text2 }}>취소</Text>
         </Pressable>
         <Pressable
-          className={`flex-1 py-4 rounded-xl items-center ${
-            isValid ? "bg-primary active:scale-[0.97]" : ""
-          }`}
-          style={!isValid ? { backgroundColor: Colors.pillBg } : undefined}
+          className="flex-1 py-4 rounded-xl items-center active:scale-[0.97]"
+          style={{ backgroundColor: isValid ? Colors.primary : Colors.pillBg }}
           onPress={handleSubmit}
           disabled={!isValid}
         >
-          <Text className="text-tablet-sm font-bold text-white">
+          <Text className="text-tablet-sm font-bold" style={{ color: isValid ? '#fff' : Colors.pillText }}>
             {initial ? "수정" : "추가"}
           </Text>
         </Pressable>

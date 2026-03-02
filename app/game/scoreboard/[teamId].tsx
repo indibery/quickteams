@@ -26,8 +26,9 @@ export default function ScoreboardScreen() {
   const { currentTeam, currentMembers, loadTeamDetail } = useTeamStore();
   const insets = useSafeAreaInsets();
 
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const isTablet = width >= 768;
+  const isLandscape = width > height;
 
   const [scores, setScores] = useState<number[]>([]);
   const [showControls, setShowControls] = useState(true);
@@ -118,11 +119,21 @@ export default function ScoreboardScreen() {
   const isTwo = teamCount === 2;
   const isMany = teamCount >= 5; // 5~6팀: 3열×2행
 
-  // iPad: 점수 폰트 더 크게
-  const scoreFontSize = isMany ? 80 : isTablet ? 200 : 140;
-  const nameFontSize = isMany ? 28 : isTablet ? 56 : 48;
-  const btnSize = isMany ? (isTablet ? "w-18 h-18" : "w-14 h-14") : (isTablet ? "w-24 h-24" : "w-20 h-20");
-  const btnTextSize = isMany ? "text-2xl" : (isTablet ? "text-5xl" : "text-4xl");
+  // 점수 폰트: iPad 가로=세로 높이의 2/3, iPhone 가로=축소
+  const scoreFontSize = isMany ? 80
+    : isTablet && isLandscape ? Math.floor(height * 0.5)
+    : isLandscape ? Math.floor(height * 0.3)
+    : isTablet ? 200 : 140;
+  const nameFontSize = isMany ? 28
+    : isTablet && isLandscape ? Math.floor(height * 0.07)
+    : isLandscape ? Math.floor(height * 0.07)
+    : isTablet ? 56 : 48;
+  const btnSize = isMany ? (isTablet ? "w-18 h-18" : "w-14 h-14")
+    : isTablet ? "w-24 h-24"
+    : isLandscape ? "w-14 h-14" : "w-20 h-20";
+  const btnTextSize = isMany ? "text-2xl"
+    : isTablet ? "text-5xl"
+    : isLandscape ? "text-2xl" : "text-4xl";
 
   return (
     <View className="flex-1 bg-black">
@@ -215,8 +226,8 @@ export default function ScoreboardScreen() {
                 {name}
               </Text>
               <Text
-                style={{ color: color.text, fontSize: scoreFontSize }}
-                className="font-bold my-2"
+                style={{ color: color.text, fontSize: scoreFontSize, lineHeight: scoreFontSize * 1.05 }}
+                className="font-bold"
               >
                 {score}
               </Text>
@@ -287,11 +298,19 @@ export default function ScoreboardScreen() {
             {/* 직접 입력 */}
             <View className="flex-row gap-2 mt-2">
               <TextInput
-                className="flex-1 rounded-xl px-3 py-2.5 text-base"
-                style={{ backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.inputBorder, color: Colors.text1 }}
+                style={{
+                  flex: 1,
+                  borderRadius: 12,
+                  paddingHorizontal: 12,
+                  paddingVertical: 10,
+                  fontSize: 16,
+                  backgroundColor: Colors.inputBg,
+                  borderWidth: 1,
+                  borderColor: Colors.inputBorder,
+                  color: Colors.text1,
+                }}
                 placeholder="직접 입력"
                 placeholderTextColor={Colors.placeholder}
-                keyboardAppearance="dark"
                 value={customSport}
                 onChangeText={setCustomSport}
               />

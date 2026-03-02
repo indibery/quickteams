@@ -19,13 +19,18 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
     <View>
       <Text style={{ color: Colors.text3 }} className="text-sm mb-1">{label}</Text>
       <Pressable
-        className="rounded-2xl px-4 py-3 active:opacity-80"
-        style={{ backgroundColor: Colors.surface }}
+        className="rounded-2xl px-4 py-3 flex-row items-center justify-between active:opacity-80"
+        style={{
+          backgroundColor: Colors.surface,
+          borderWidth: 1,
+          borderColor: Colors.borderLight,
+        }}
         onPress={() => setOpen(true)}
       >
         <Text className="text-tablet-sm font-medium" style={{ color: Colors.text1 }}>
           {selected?.label ?? "선택"}
         </Text>
+        <Text style={{ color: Colors.text3, fontSize: 14, marginLeft: 8 }}>▾</Text>
       </Pressable>
       <Modal visible={open} transparent animationType="fade">
         <Pressable

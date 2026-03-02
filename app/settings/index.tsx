@@ -338,8 +338,11 @@ export default function SettingsScreen() {
 
             {/* 텍스트 입력 */}
             <TextInput
-              className="rounded-xl p-4 text-base mb-4"
               style={{
+                borderRadius: 12,
+                padding: 16,
+                fontSize: 16,
+                marginBottom: 16,
                 minHeight: 200,
                 textAlignVertical: "top",
                 backgroundColor: Colors.inputBg,

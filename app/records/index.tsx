@@ -12,8 +12,6 @@ import { useEffect } from "react";
 import { useGameStore } from "@/stores/gameStore";
 import type { GameRecord } from "@/lib/types";
 import { Colors } from "@/constants/theme";
-import AnimatedCard from "@/components/common/AnimatedCard";
-
 type GameRecordWithTeam = GameRecord & { teamName: string };
 
 export default function RecordsScreen() {
@@ -82,10 +80,9 @@ export default function RecordsScreen() {
     return "🏅";
   };
 
-  const renderRecord = ({ item, index }: { item: GameRecordWithTeam; index: number }) => {
+  const renderRecord = ({ item }: { item: GameRecordWithTeam }) => {
     const dateOnly = item.gameDate.split("T")[0].split(" ")[0];
     return (
-      <AnimatedCard index={index}>
       <Pressable
         className="rounded-2xl px-4 py-3.5 mb-2.5"
         style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
@@ -105,7 +102,6 @@ export default function RecordsScreen() {
         {/* 2행: 점수 */}
         <View className="mt-1.5">{renderScores(item)}</View>
       </Pressable>
-      </AnimatedCard>
     );
   };
 

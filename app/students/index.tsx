@@ -15,7 +15,7 @@ import type { Student, StudentInput } from "@/lib/types";
 import StudentForm from "@/components/students/StudentForm";
 import PickerSelect from "@/components/common/PickerSelect";
 import { Colors } from "@/constants/theme";
-import AnimatedCard from "@/components/common/AnimatedCard";
+// AnimatedCard는 FlatList 안에서 reanimated entering + Modal 충돌 이슈로 제거
 
 const gradeOptions = Array.from({ length: 6 }, (_, i) => ({
   label: `${i + 1}학년`,
@@ -118,8 +118,7 @@ export default function StudentsScreen() {
     );
   };
 
-  const renderStudent = ({ item, index }: { item: Student; index: number }) => (
-    <AnimatedCard index={index}>
+  const renderStudent = ({ item }: { item: Student }) => (
     <Pressable
       className="rounded-2xl p-4 mb-2.5 flex-row items-center active:opacity-80"
       style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
@@ -180,7 +179,6 @@ export default function StudentsScreen() {
         <Text style={{ fontSize: 16 }}>🗑️</Text>
       </Pressable>
     </Pressable>
-    </AnimatedCard>
   );
 
   return (

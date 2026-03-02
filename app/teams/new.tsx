@@ -8,10 +8,11 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSQLiteContext } from "expo-sqlite";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "expo-router";
 import { useStudentStore } from "@/stores/studentStore";
 import { useTeamStore } from "@/stores/teamStore";
@@ -77,7 +78,9 @@ export default function TeamManagementScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { loadStudents, setFilter } = useStudentStore();
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+  const { students: storeStudents, loadStudents, setFilter } = useStudentStore();
   const {
     teams,
     isLoading,
@@ -112,6 +115,12 @@ export default function TeamManagementScreen() {
   const [editMembers, setEditMembers] = useState<MemberWithInfo[]>([]);
   const [editMembersLoading, setEditMembersLoading] = useState(false);
   const [swapResult, setSwapResult] = useState<SwapResult | null>(null); // 소폭 교체 결과
+
+  // 결과 화면에서 runningRecord 표시를 위한 학생 lookup map
+  const studentMap = useMemo(
+    () => new Map(storeStudents.map((s) => [s.id, s])),
+    [storeStudents]
+  );
 
   useEffect(() => {
     loadAllTeams(db);
@@ -507,20 +516,31 @@ export default function TeamManagementScreen() {
                       </Text>
                     </View>
                     <View className="flex-row flex-wrap gap-2">
-                      {team.members.map((m) => (
-                        <View
-                          key={m.id}
-                          className="px-3 py-1.5 rounded-lg"
-                          style={{ backgroundColor: m.gender === "M" ? Colors.male : Colors.female }}
-                        >
-                          <Text className="text-sm" style={{ color: Colors.text1 }}>
-                            {m.name}{" "}
-                            <Text className="text-xs" style={{ color: Colors.text3 }}>
-                              ({m.abilityScore.toFixed(1)})
+                      {team.members.map((m) => {
+                        const full = studentMap.get(m.id);
+                        return (
+                          <View
+                            key={m.id}
+                            style={{ backgroundColor: m.gender === "M" ? Colors.male : Colors.female }}
+                            className={`rounded-xl items-center ${isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
+                          >
+                            <Text
+                              className={`font-bold ${isTablet ? "text-tablet-md" : "text-sm"}`}
+                              style={{ color: Colors.text1 }}
+                            >
+                              {m.name}
                             </Text>
-                          </Text>
-                        </View>
-                      ))}
+                            {full?.runningRecord != null && (
+                              <Text
+                                className={`mt-0.5 ${isTablet ? "text-sm" : "text-xs"}`}
+                                style={{ color: Colors.text2 }}
+                              >
+                                🏃 {full.runningRecord}초
+                              </Text>
+                            )}
+                          </View>
+                        );
+                      })}
                     </View>
                   </View>
                 ))}
@@ -553,11 +573,18 @@ export default function TeamManagementScreen() {
                     팀 이름 (선택)
                   </Text>
                   <TextInput
-                    className="rounded-xl px-4 py-3 text-tablet-sm"
-                    style={{ backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.inputBorder, color: Colors.text1 }}
+                    style={{
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 12,
+                      fontSize: 18,
+                      backgroundColor: Colors.inputBg,
+                      borderWidth: 1,
+                      borderColor: Colors.inputBorder,
+                      color: Colors.text1,
+                    }}
                     placeholder="예: 피구, 체육대회, 수업용"
                     placeholderTextColor={Colors.placeholder}
-                    keyboardAppearance="dark"
                     value={label}
                     onChangeText={setLabel}
                   />
@@ -724,13 +751,19 @@ export default function TeamManagementScreen() {
                         <View
                           key={m.id}
                           style={{ backgroundColor: m.gender === "M" ? Colors.male : Colors.female }}
-                          className="px-3 py-2 rounded-xl items-center"
+                          className={`rounded-xl items-center ${isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
                         >
-                          <Text className="text-tablet-md font-bold" style={{ color: Colors.text1 }}>
+                          <Text
+                            className={`font-bold ${isTablet ? "text-tablet-md" : "text-sm"}`}
+                            style={{ color: Colors.text1 }}
+                          >
                             {m.studentName}
                           </Text>
                           {m.runningRecord != null && (
-                            <Text className="text-sm mt-0.5" style={{ color: Colors.text2 }}>
+                            <Text
+                              className={`mt-0.5 ${isTablet ? "text-sm" : "text-xs"}`}
+                              style={{ color: Colors.text2 }}
+                            >
                               {m.runningRecord}초
                             </Text>
                           )}
@@ -833,16 +866,19 @@ export default function TeamManagementScreen() {
                                 borderWidth: isSwapped ? 1.5 : 0,
                                 borderColor: isSwapped ? Colors.swappedBorder : "transparent",
                               }}
-                              className="px-3 py-2 rounded-xl items-center"
+                              className={`rounded-xl items-center ${isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
                             >
                               <Text
                                 style={{ color: isSwapped ? Colors.swappedText : Colors.text1 }}
-                                className="text-tablet-md font-bold"
+                                className={`font-bold ${isTablet ? "text-tablet-md" : "text-sm"}`}
                               >
                                 {isSwapped ? "★ " : ""}{m.studentName}
                               </Text>
                               {m.runningRecord != null && (
-                                <Text className="text-sm mt-0.5" style={{ color: Colors.text2 }}>
+                                <Text
+                                  className={`mt-0.5 ${isTablet ? "text-sm" : "text-xs"}`}
+                                  style={{ color: Colors.text2 }}
+                                >
                                   {m.runningRecord}초
                                 </Text>
                               )}
@@ -887,11 +923,18 @@ export default function TeamManagementScreen() {
                   팀 이름
                 </Text>
                 <TextInput
-                  className="rounded-xl px-4 py-3 text-tablet-sm"
-                  style={{ backgroundColor: Colors.inputBg, borderWidth: 1, borderColor: Colors.inputBorder, color: Colors.text1 }}
+                  style={{
+                    borderRadius: 12,
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    fontSize: 18,
+                    backgroundColor: Colors.inputBg,
+                    borderWidth: 1,
+                    borderColor: Colors.inputBorder,
+                    color: Colors.text1,
+                  }}
                   placeholder="예: 피구, 체육대회, 수업용"
                   placeholderTextColor={Colors.placeholder}
-                  keyboardAppearance="dark"
                   value={editLabel}
                   onChangeText={setEditLabel}
                 />
