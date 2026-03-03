@@ -6,12 +6,14 @@ import { useEffect, useState } from "react";
 import * as repo from "@/lib/db/repositories/studentRepository";
 import type { Student } from "@/lib/types";
 import { Colors } from "@/constants/theme";
+import { useResponsiveSizes } from "@/hooks/useResponsiveSizes";
 
 export default function StudentDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const db = useSQLiteContext();
   const router = useRouter();
   const [student, setStudent] = useState<Student | null>(null);
+  const rs = useResponsiveSizes();
 
   useEffect(() => {
     if (id) {
@@ -22,7 +24,7 @@ export default function StudentDetailScreen() {
   if (!student) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: Colors.bg }}>
-        <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>로딩 중...</Text>
+        <Text style={{ color: Colors.text2, fontSize: rs.sm }}>로딩 중...</Text>
       </SafeAreaView>
     );
   }
@@ -40,10 +42,10 @@ export default function StudentDetailScreen() {
             </Text>
           </View>
           <View>
-            <Text className="text-tablet-lg font-bold" style={{ color: Colors.text1 }}>
+            <Text className="font-bold" style={{ color: Colors.text1, fontSize: rs.lg }}>
               {student.name}
             </Text>
-            <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>
+            <Text style={{ color: Colors.text2, fontSize: rs.sm }}>
               {student.grade}학년 {student.class}반 {student.studentNumber}번
             </Text>
           </View>
@@ -78,7 +80,7 @@ export default function StudentDetailScreen() {
           className="bg-primary rounded-xl py-4 items-center active:scale-[0.97]"
           onPress={() => router.back()}
         >
-          <Text className="text-tablet-sm font-bold text-white">돌아가기</Text>
+          <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>돌아가기</Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -94,12 +96,13 @@ function InfoRow({
   value: string;
   highlight?: boolean;
 }) {
+  const rs = useResponsiveSizes();
   return (
     <View className="flex-row justify-between py-2">
-      <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>{label}</Text>
+      <Text style={{ color: Colors.text2, fontSize: rs.sm }}>{label}</Text>
       <Text
-        className="text-tablet-sm font-bold"
-        style={{ color: highlight ? Colors.primary : Colors.text1 }}
+        className="font-bold"
+        style={{ color: highlight ? Colors.primary : Colors.text1, fontSize: rs.sm }}
       >
         {value}
       </Text>

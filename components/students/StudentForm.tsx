@@ -1,8 +1,10 @@
-import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
+import { View, Text, TextInput, Pressable, ScrollView, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import type { StudentInput, Gender, Student } from "@/lib/types";
 import PickerSelect from "@/components/common/PickerSelect";
 import { Colors } from "@/constants/theme";
+import { useResponsiveSizes } from "@/hooks/useResponsiveSizes";
 
 type Props = {
   initial?: Student;
@@ -50,9 +52,15 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
   };
 
   const isValid = name.trim() !== "" && studentNumber.trim() !== "";
+  const rs = useResponsiveSizes();
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView className="flex-1 p-6" style={{ backgroundColor: Colors.bg }}>
+    <ScrollView
+      className="flex-1 p-6"
+      style={{ backgroundColor: Colors.bg }}
+      contentContainerStyle={Platform.OS === "android" ? { paddingBottom: insets.bottom + 16 } : undefined}
+    >
       {/* 이름 */}
       <Text className="text-sm mb-1" style={{ color: Colors.text2 }}>이름 *</Text>
       <TextInput
@@ -64,7 +72,7 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 12,
-          fontSize: 18,
+          fontSize: rs.inputFs,
           marginBottom: 16,
         }}
         placeholder="학생 이름"
@@ -104,7 +112,7 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 12,
-          fontSize: 18,
+          fontSize: rs.inputFs,
           marginBottom: 16,
         }}
         placeholder="출석 번호"
@@ -125,8 +133,8 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           onPress={() => setGender("M")}
         >
           <Text
-            className="text-tablet-sm font-bold"
-            style={{ color: gender === "M" ? "#fff" : Colors.pillText }}
+            className="font-bold"
+            style={{ color: gender === "M" ? "#fff" : Colors.pillText, fontSize: rs.sm }}
           >
             남
           </Text>
@@ -139,8 +147,8 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           onPress={() => setGender("F")}
         >
           <Text
-            className="text-tablet-sm font-bold"
-            style={{ color: gender === "F" ? "#fff" : Colors.pillText }}
+            className="font-bold"
+            style={{ color: gender === "F" ? "#fff" : Colors.pillText, fontSize: rs.sm }}
           >
             여
           </Text>
@@ -161,7 +169,7 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 12,
-          fontSize: 18,
+          fontSize: rs.inputFs,
           marginBottom: 16,
         }}
         placeholder="예: 12.15"
@@ -184,7 +192,7 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           <Text className="text-xl font-bold" style={{ color: Colors.text2 }}>−</Text>
         </Pressable>
         <View className="flex-1 rounded-xl py-3 items-center" style={{ backgroundColor: Colors.card }}>
-          <Text className="text-tablet-sm font-bold" style={{ color: Colors.text1 }}>
+          <Text className="font-bold" style={{ color: Colors.text1, fontSize: rs.sm }}>
             {adjustment === 0
               ? "보정 없음"
               : adjustment > 0
@@ -208,7 +216,7 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           style={{ backgroundColor: Colors.surface }}
           onPress={onCancel}
         >
-          <Text className="text-tablet-sm font-bold" style={{ color: Colors.text2 }}>취소</Text>
+          <Text className="font-bold" style={{ color: Colors.text2, fontSize: rs.sm }}>취소</Text>
         </Pressable>
         <Pressable
           className="flex-1 py-4 rounded-xl items-center active:scale-[0.97]"
@@ -216,7 +224,7 @@ export default function StudentForm({ initial, defaultGrade = 1, defaultClass = 
           onPress={handleSubmit}
           disabled={!isValid}
         >
-          <Text className="text-tablet-sm font-bold" style={{ color: isValid ? '#fff' : Colors.pillText }}>
+          <Text className="font-bold" style={{ color: isValid ? '#fff' : Colors.pillText, fontSize: rs.sm }}>
             {initial ? "수정" : "추가"}
           </Text>
         </Pressable>

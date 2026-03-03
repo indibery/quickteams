@@ -15,6 +15,7 @@ import type { Student, StudentInput } from "@/lib/types";
 import StudentForm from "@/components/students/StudentForm";
 import PickerSelect from "@/components/common/PickerSelect";
 import { Colors } from "@/constants/theme";
+import { useResponsiveSizes } from "@/hooks/useResponsiveSizes";
 // AnimatedCard는 FlatList 안에서 reanimated entering + Modal 충돌 이슈로 제거
 
 const gradeOptions = Array.from({ length: 6 }, (_, i) => ({
@@ -43,6 +44,7 @@ export default function StudentsScreen() {
     recalculateScores,
   } = useStudentStore();
 
+  const rs = useResponsiveSizes();
   const [showForm, setShowForm] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
 
@@ -136,7 +138,7 @@ export default function StudentsScreen() {
 
       {/* 학생 정보 */}
       <View className="flex-1">
-        <Text className="text-tablet-sm font-bold" style={{ color: Colors.text1 }}>
+        <Text className="font-bold" style={{ color: Colors.text1, fontSize: rs.sm }}>
           {item.studentNumber}번 {item.name}
         </Text>
         <View className="flex-row gap-2 mt-1">
@@ -163,7 +165,7 @@ export default function StudentsScreen() {
       {item.abilityScore != null && (
         <View className="rounded-xl px-3 py-1.5 mr-2" style={{ backgroundColor: Colors.primarySoft }}>
           <Text className="text-xs" style={{ color: Colors.text3 }}>능력</Text>
-          <Text className="text-tablet-sm font-bold" style={{ color: Colors.primary }}>
+          <Text className="font-bold" style={{ color: Colors.primary, fontSize: rs.sm }}>
             {item.abilityScore.toFixed(1)}
           </Text>
         </View>
@@ -207,18 +209,18 @@ export default function StudentsScreen() {
         {/* 학생 추가 */}
         <Pressable
           className="bg-primary rounded-2xl px-5 items-center justify-center self-end active:opacity-80"
-          style={{ height: 50 }}
+          style={{ height: rs.buttonH }}
           onPress={() => setShowForm(true)}
         >
-          <Text className="text-white text-tablet-sm font-bold">+ 추가</Text>
+          <Text className="text-white font-bold" style={{ fontSize: rs.sm }}>+ 추가</Text>
         </Pressable>
         {/* 학급 전체 삭제 */}
         <Pressable
           className="rounded-2xl px-4 items-center justify-center self-end active:opacity-80"
-          style={{ height: 50, backgroundColor: Colors.dangerSoft }}
+          style={{ height: rs.buttonH, backgroundColor: Colors.dangerSoft }}
           onPress={handleDeleteClass}
         >
-          <Text className="text-tablet-sm font-bold" style={{ color: Colors.dangerText }}>학급 삭제</Text>
+          <Text className="font-bold" style={{ color: Colors.dangerText, fontSize: rs.sm }}>학급 삭제</Text>
         </Pressable>
       </View>
 
@@ -239,7 +241,7 @@ export default function StudentsScreen() {
           <View className="w-20 h-20 rounded-3xl items-center justify-center mb-4" style={{ backgroundColor: Colors.surface }}>
             <Text style={{ fontSize: 36 }}>📝</Text>
           </View>
-          <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>
+          <Text style={{ color: Colors.text2, fontSize: rs.sm }}>
             학생을 추가해주세요
           </Text>
         </View>

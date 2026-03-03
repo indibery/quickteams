@@ -12,11 +12,13 @@ import { useEffect } from "react";
 import { useGameStore } from "@/stores/gameStore";
 import type { GameRecord } from "@/lib/types";
 import { Colors } from "@/constants/theme";
+import { useResponsiveSizes } from "@/hooks/useResponsiveSizes";
 type GameRecordWithTeam = GameRecord & { teamName: string };
 
 export default function RecordsScreen() {
   const db = useSQLiteContext();
   const { records, isLoading, loadAllRecords, removeRecord } = useGameStore();
+  const rs = useResponsiveSizes();
 
   useEffect(() => {
     loadAllRecords(db);
@@ -122,7 +124,7 @@ export default function RecordsScreen() {
           <View className="w-20 h-20 rounded-3xl items-center justify-center mb-4" style={{ backgroundColor: Colors.surface }}>
             <Text style={{ fontSize: 36 }}>📊</Text>
           </View>
-          <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>
+          <Text style={{ color: Colors.text2, fontSize: rs.sm }}>
             경기 기록이 없습니다
           </Text>
           <Text className="text-sm mt-1" style={{ color: Colors.text3 }}>

@@ -1,6 +1,7 @@
 import { View, Text, Pressable, Modal, FlatList } from "react-native";
 import { useState } from "react";
 import { Colors } from "@/constants/theme";
+import { useResponsiveSizes } from "@/hooks/useResponsiveSizes";
 
 type Option = { label: string; value: string | number };
 
@@ -14,6 +15,7 @@ type Props = {
 export default function PickerSelect({ label, value, options, onSelect }: Props) {
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value);
+  const rs = useResponsiveSizes();
 
   return (
     <View>
@@ -27,7 +29,7 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
         }}
         onPress={() => setOpen(true)}
       >
-        <Text className="text-tablet-sm font-medium" style={{ color: Colors.text1 }}>
+        <Text className="font-medium" style={{ color: Colors.text1, fontSize: rs.sm }}>
           {selected?.label ?? "선택"}
         </Text>
         <Text style={{ color: Colors.text3, fontSize: 14, marginLeft: 8 }}>▾</Text>
@@ -46,7 +48,7 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
               borderColor: Colors.border,
             }}
           >
-            <Text className="text-tablet-md font-bold mb-4" style={{ color: Colors.text1 }}>
+            <Text className="font-bold mb-4" style={{ color: Colors.text1, fontSize: rs.md }}>
               {label}
             </Text>
             <FlatList
@@ -62,10 +64,8 @@ export default function PickerSelect({ label, value, options, onSelect }: Props)
                   }}
                 >
                   <Text
-                    className={`text-tablet-sm ${
-                      item.value === value ? "font-bold" : ""
-                    }`}
-                    style={{ color: item.value === value ? Colors.primary : Colors.text1 }}
+                    className={item.value === value ? "font-bold" : ""}
+                    style={{ color: item.value === value ? Colors.primary : Colors.text1, fontSize: rs.sm }}
                   >
                     {item.label}
                   </Text>

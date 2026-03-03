@@ -8,7 +8,7 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
-  useWindowDimensions,
+  Platform,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSQLiteContext } from "expo-sqlite";
@@ -16,6 +16,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "expo-router";
 import { useStudentStore } from "@/stores/studentStore";
 import { useTeamStore } from "@/stores/teamStore";
+import { useResponsiveSizes } from "@/hooks/useResponsiveSizes";
 import type { Team } from "@/lib/types";
 import PickerSelect from "@/components/common/PickerSelect";
 import {
@@ -78,8 +79,7 @@ export default function TeamManagementScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 768;
+  const rs = useResponsiveSizes();
   const { students: storeStudents, loadStudents, setFilter } = useStudentStore();
   const {
     teams,
@@ -380,26 +380,26 @@ export default function TeamManagementScreen() {
             style={{ backgroundColor: Colors.primarySoft }}
             onPress={() => handleViewOpen(item)}
           >
-            <Text className="text-tablet-sm font-bold" style={{ color: Colors.primary }}>👀 보기</Text>
+            <Text className="font-bold" style={{ color: Colors.primary, fontSize: rs.sm }}>👀 보기</Text>
           </Pressable>
           <Pressable
             className="flex-1 py-3 rounded-xl items-center active:opacity-80"
             style={{ backgroundColor: Colors.surface }}
             onPress={() => handleEditOpen(item)}
           >
-            <Text className="text-tablet-sm font-bold" style={{ color: Colors.text2 }}>✏️ 편집</Text>
+            <Text className="font-bold" style={{ color: Colors.text2, fontSize: rs.sm }}>✏️ 편집</Text>
           </Pressable>
           <Pressable
             className="py-3 px-4 rounded-xl items-center active:opacity-80"
             style={{ backgroundColor: Colors.dangerSoft }}
             onPress={() => handleDelete(item)}
           >
-            <Text className="text-tablet-sm font-bold" style={{ color: Colors.dangerText }}>🗑️</Text>
+            <Text className="font-bold" style={{ color: Colors.dangerText, fontSize: rs.sm }}>🗑️</Text>
           </Pressable>
         </View>
       </View>
     ),
-    [router]
+    [router, rs]
   );
 
   return (
@@ -419,10 +419,10 @@ export default function TeamManagementScreen() {
         </View>
         <Pressable
           className="bg-primary rounded-2xl px-5 items-center justify-center self-end active:opacity-80"
-          style={{ height: 50 }}
+          style={{ height: rs.buttonH }}
           onPress={() => setShowCreate(true)}
         >
-          <Text className="text-white text-tablet-sm font-bold">+ 새 팀</Text>
+          <Text className="text-white font-bold" style={{ fontSize: rs.sm }}>+ 새 팀</Text>
         </Pressable>
       </View>
 
@@ -442,7 +442,7 @@ export default function TeamManagementScreen() {
           <View className="w-20 h-20 rounded-3xl items-center justify-center mb-4" style={{ backgroundColor: Colors.surface }}>
             <Text style={{ fontSize: 36 }}>📋</Text>
           </View>
-          <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>저장된 팀이 없습니다</Text>
+          <Text style={{ color: Colors.text2, fontSize: rs.sm }}>저장된 팀이 없습니다</Text>
           <Pressable
             className="bg-primary rounded-2xl px-6 py-3 mt-4 active:opacity-80"
             onPress={() => setShowCreate(true)}
@@ -507,7 +507,7 @@ export default function TeamManagementScreen() {
                           marginRight: 8,
                         }}
                       />
-                      <Text className="text-tablet-md font-bold flex-1" style={{ color: Colors.text1 }}>
+                      <Text className="font-bold flex-1" style={{ color: Colors.text1, fontSize: rs.md }}>
                         {team.teamName}
                       </Text>
                       <Text className="text-sm" style={{ color: Colors.text2 }}>
@@ -522,17 +522,17 @@ export default function TeamManagementScreen() {
                           <View
                             key={m.id}
                             style={{ backgroundColor: m.gender === "M" ? Colors.male : Colors.female }}
-                            className={`rounded-xl items-center ${isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
+                            className={`rounded-xl items-center ${rs.isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
                           >
                             <Text
-                              className={`font-bold ${isTablet ? "text-tablet-md" : "text-sm"}`}
-                              style={{ color: Colors.text1 }}
+                              className="font-bold"
+                              style={{ color: Colors.text1, fontSize: rs.md }}
                             >
                               {m.name}
                             </Text>
                             {full?.runningRecord != null && (
                               <Text
-                                className={`mt-0.5 ${isTablet ? "text-sm" : "text-xs"}`}
+                                className={`mt-0.5 ${rs.isTablet ? "text-sm" : "text-xs"}`}
                                 style={{ color: Colors.text2 }}
                               >
                                 🏃 {full.runningRecord}초
@@ -546,7 +546,15 @@ export default function TeamManagementScreen() {
                 ))}
               </ScrollView>
 
-              <View className="flex-row gap-3 px-6 py-4" style={{ backgroundColor: Colors.card, borderTopWidth: 1, borderTopColor: Colors.border }}>
+              <View
+                className="flex-row gap-3 px-6 py-4"
+                style={{
+                  backgroundColor: Colors.card,
+                  borderTopWidth: 1,
+                  borderTopColor: Colors.border,
+                  paddingBottom: Platform.OS === "android" ? insets.bottom + 16 : undefined,
+                }}
+              >
                 <Pressable
                   className="flex-1 py-4 rounded-xl items-center"
                   style={{ backgroundColor: Colors.surface }}
@@ -555,13 +563,13 @@ export default function TeamManagementScreen() {
                     setCreateStep("config");
                   }}
                 >
-                  <Text className="text-tablet-sm font-bold" style={{ color: Colors.text2 }}>재배정</Text>
+                  <Text className="font-bold" style={{ color: Colors.text2, fontSize: rs.sm }}>재배정</Text>
                 </Pressable>
                 <Pressable
                   className="flex-1 py-4 rounded-xl bg-primary items-center"
                   onPress={handleSave}
                 >
-                  <Text className="text-tablet-sm font-bold text-white">저장</Text>
+                  <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>저장</Text>
                 </Pressable>
               </View>
             </>
@@ -569,7 +577,7 @@ export default function TeamManagementScreen() {
             <>
               <ScrollView className="flex-1 px-6 pt-4">
                 <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
-                  <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
+                  <Text className="font-bold mb-3" style={{ color: Colors.text1, fontSize: rs.sm }}>
                     팀 이름 (선택)
                   </Text>
                   <TextInput
@@ -577,7 +585,7 @@ export default function TeamManagementScreen() {
                       borderRadius: 12,
                       paddingHorizontal: 16,
                       paddingVertical: 12,
-                      fontSize: 18,
+                      fontSize: rs.inputFs,
                       backgroundColor: Colors.inputBg,
                       borderWidth: 1,
                       borderColor: Colors.inputBorder,
@@ -591,7 +599,7 @@ export default function TeamManagementScreen() {
                 </View>
 
                 <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
-                  <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
+                  <Text className="font-bold mb-3" style={{ color: Colors.text1, fontSize: rs.sm }}>
                     학년 · 반
                   </Text>
                   <View className="flex-row gap-3">
@@ -615,7 +623,7 @@ export default function TeamManagementScreen() {
                 </View>
 
                 <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
-                  <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
+                  <Text className="font-bold mb-3" style={{ color: Colors.text1, fontSize: rs.sm }}>
                     팀 수{mode === "separate" ? ` (실제 ${teamCount * 2}팀: 남${teamCount} + 여${teamCount})` : ""}
                   </Text>
                   <View className="flex-row gap-3">
@@ -629,8 +637,8 @@ export default function TeamManagementScreen() {
                         onPress={() => setTeamCount(opt.value)}
                       >
                         <Text
-                          className="text-tablet-sm font-bold"
-                          style={{ color: teamCount === opt.value ? '#fff' : Colors.pillText }}
+                          className="font-bold"
+                          style={{ color: teamCount === opt.value ? '#fff' : Colors.pillText, fontSize: rs.sm }}
                         >
                           {opt.label}
                         </Text>
@@ -640,7 +648,7 @@ export default function TeamManagementScreen() {
                 </View>
 
                 <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
-                  <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
+                  <Text className="font-bold mb-3" style={{ color: Colors.text1, fontSize: rs.sm }}>
                     성별 구성
                   </Text>
                   <View className="flex-row gap-3">
@@ -659,8 +667,8 @@ export default function TeamManagementScreen() {
                         }}
                       >
                         <Text
-                          className="text-tablet-sm font-bold"
-                          style={{ color: mode === opt.value ? '#fff' : Colors.pillText }}
+                          className="font-bold"
+                          style={{ color: mode === opt.value ? '#fff' : Colors.pillText, fontSize: rs.sm }}
                         >
                           {opt.label}
                         </Text>
@@ -670,12 +678,20 @@ export default function TeamManagementScreen() {
                 </View>
               </ScrollView>
 
-              <View className="px-6 py-4" style={{ backgroundColor: Colors.card, borderTopWidth: 1, borderTopColor: Colors.border }}>
+              <View
+                className="px-6 py-4"
+                style={{
+                  backgroundColor: Colors.card,
+                  borderTopWidth: 1,
+                  borderTopColor: Colors.border,
+                  paddingBottom: Platform.OS === "android" ? insets.bottom + 16 : undefined,
+                }}
+              >
                 <Pressable
                   className="bg-primary rounded-xl py-4 items-center active:scale-[0.97]"
                   onPress={handleAssign}
                 >
-                  <Text className="text-tablet-md font-bold text-white">
+                  <Text className="font-bold text-white" style={{ fontSize: rs.md }}>
                     👥 팀 배정하기
                   </Text>
                 </Pressable>
@@ -696,11 +712,14 @@ export default function TeamManagementScreen() {
           </View>
 
           {viewTeam && (
-            <ScrollView className="flex-1 px-6 pt-4">
+            <ScrollView
+              className="flex-1 px-6 pt-4"
+              contentContainerStyle={Platform.OS === "android" ? { paddingBottom: insets.bottom + 16 } : undefined}
+            >
               {/* 팀 정보 */}
               <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
                 <Text className="text-sm mb-1" style={{ color: Colors.text2 }}>팀 정보</Text>
-                <Text className="text-tablet-md font-bold" style={{ color: Colors.text1 }}>
+                <Text className="font-bold" style={{ color: Colors.text1, fontSize: rs.md }}>
                   {viewTeam.grade}학년 {viewTeam.class}반 · {viewTeam.teamCount}팀 ·{" "}
                   {viewTeam.teamType === "mixed" ? "혼성" : "성별분리"}
                 </Text>
@@ -737,10 +756,10 @@ export default function TeamManagementScreen() {
                           width: 16, height: 16, borderRadius: 8, marginRight: 10,
                         }}
                       />
-                      <Text className="text-tablet-md font-bold flex-1" style={{ color: Colors.text1 }}>
+                      <Text className="font-bold flex-1" style={{ color: Colors.text1, fontSize: rs.md }}>
                         {group.teamName}
                       </Text>
-                      <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>
+                      <Text style={{ color: Colors.text2, fontSize: rs.sm }}>
                         {group.members.filter(m => m.gender === "M").length}남{" "}
                         {group.members.filter(m => m.gender === "F").length}여
                       </Text>
@@ -751,17 +770,17 @@ export default function TeamManagementScreen() {
                         <View
                           key={m.id}
                           style={{ backgroundColor: m.gender === "M" ? Colors.male : Colors.female }}
-                          className={`rounded-xl items-center ${isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
+                          className={`rounded-xl items-center ${rs.isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
                         >
                           <Text
-                            className={`font-bold ${isTablet ? "text-tablet-md" : "text-sm"}`}
-                            style={{ color: Colors.text1 }}
+                            className="font-bold"
+                            style={{ color: Colors.text1, fontSize: rs.md }}
                           >
                             {m.studentName}
                           </Text>
                           {m.runningRecord != null && (
                             <Text
-                              className={`mt-0.5 ${isTablet ? "text-sm" : "text-xs"}`}
+                              className={`mt-0.5 ${rs.isTablet ? "text-sm" : "text-xs"}`}
                               style={{ color: Colors.text2 }}
                             >
                               {m.runningRecord}초
@@ -783,7 +802,7 @@ export default function TeamManagementScreen() {
                   router.push(`/teams/${viewTeam.id}`);
                 }}
               >
-                <Text className="text-tablet-sm font-bold" style={{ color: Colors.primary }}>📋 명단 전체 보기</Text>
+                <Text className="font-bold" style={{ color: Colors.primary, fontSize: rs.sm }}>📋 명단 전체 보기</Text>
               </Pressable>
             </ScrollView>
           )}
@@ -801,11 +820,14 @@ export default function TeamManagementScreen() {
           </View>
 
           {editTeam && (
-            <ScrollView className="flex-1 px-6 pt-4">
+            <ScrollView
+              className="flex-1 px-6 pt-4"
+              contentContainerStyle={Platform.OS === "android" ? { paddingBottom: insets.bottom + 16 } : undefined}
+            >
               {/* 팀 정보 */}
               <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
                 <Text className="text-sm mb-1" style={{ color: Colors.text2 }}>팀 정보</Text>
-                <Text className="text-tablet-md font-bold" style={{ color: Colors.text1 }}>
+                <Text className="font-bold" style={{ color: Colors.text1, fontSize: rs.md }}>
                   {editTeam.grade}학년 {editTeam.class}반 · {editTeam.teamCount}팀 ·{" "}
                   {editTeam.teamType === "mixed" ? "혼성" : "성별분리"}
                 </Text>
@@ -817,7 +839,7 @@ export default function TeamManagementScreen() {
               {/* 팀원 구성 */}
               <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
                 <View className="flex-row items-center justify-between mb-3">
-                  <Text className="text-tablet-sm font-bold" style={{ color: Colors.text1 }}>
+                  <Text className="font-bold" style={{ color: Colors.text1, fontSize: rs.sm }}>
                     {swapResult ? "🔄 교체 미리보기" : "현재 팀원 구성"}
                   </Text>
                   {swapResult && (
@@ -845,8 +867,8 @@ export default function TeamManagementScreen() {
                             width: 14, height: 14, borderRadius: 7, marginRight: 8,
                           }}
                         />
-                        <Text className="text-tablet-md font-bold flex-1" style={{ color: Colors.text1 }}>{group.teamName}</Text>
-                        <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>
+                        <Text className="font-bold flex-1" style={{ color: Colors.text1, fontSize: rs.md }}>{group.teamName}</Text>
+                        <Text style={{ color: Colors.text2, fontSize: rs.sm }}>
                           {group.members.filter(m => m.gender === "M").length}남{" "}
                           {group.members.filter(m => m.gender === "F").length}여
                           {swapResult && (
@@ -866,17 +888,17 @@ export default function TeamManagementScreen() {
                                 borderWidth: isSwapped ? 1.5 : 0,
                                 borderColor: isSwapped ? Colors.swappedBorder : "transparent",
                               }}
-                              className={`rounded-xl items-center ${isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
+                              className={`rounded-xl items-center ${rs.isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
                             >
                               <Text
-                                style={{ color: isSwapped ? Colors.swappedText : Colors.text1 }}
-                                className={`font-bold ${isTablet ? "text-tablet-md" : "text-sm"}`}
+                                className="font-bold"
+                                style={{ color: isSwapped ? Colors.swappedText : Colors.text1, fontSize: rs.md }}
                               >
                                 {isSwapped ? "★ " : ""}{m.studentName}
                               </Text>
                               {m.runningRecord != null && (
                                 <Text
-                                  className={`mt-0.5 ${isTablet ? "text-sm" : "text-xs"}`}
+                                  className={`mt-0.5 ${rs.isTablet ? "text-sm" : "text-xs"}`}
                                   style={{ color: Colors.text2 }}
                                 >
                                   {m.runningRecord}초
@@ -919,7 +941,7 @@ export default function TeamManagementScreen() {
 
               {/* 팀 이름 편집 */}
               <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
-                <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
+                <Text className="font-bold mb-3" style={{ color: Colors.text1, fontSize: rs.sm }}>
                   팀 이름
                 </Text>
                 <TextInput
@@ -927,7 +949,7 @@ export default function TeamManagementScreen() {
                     borderRadius: 12,
                     paddingHorizontal: 16,
                     paddingVertical: 12,
-                    fontSize: 18,
+                    fontSize: rs.inputFs,
                     backgroundColor: Colors.inputBg,
                     borderWidth: 1,
                     borderColor: Colors.inputBorder,
@@ -948,7 +970,7 @@ export default function TeamManagementScreen() {
                       className="bg-primary rounded-xl py-4 items-center active:scale-[0.97]"
                       onPress={handleSaveSwap}
                     >
-                      <Text className="text-tablet-sm font-bold text-white">
+                      <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>
                         ✅ 교체 결과 저장
                       </Text>
                     </Pressable>
@@ -957,7 +979,7 @@ export default function TeamManagementScreen() {
                       style={{ backgroundColor: Colors.warning }}
                       onPress={handleReassign}
                     >
-                      <Text className="text-tablet-sm font-bold" style={{ color: Colors.bg }}>
+                      <Text className="font-bold" style={{ color: Colors.bg, fontSize: rs.sm }}>
                         🔄 다시 교체
                       </Text>
                     </Pressable>
@@ -972,7 +994,7 @@ export default function TeamManagementScreen() {
                         setEditMembersLoading(false);
                       }}
                     >
-                      <Text className="text-tablet-sm font-bold" style={{ color: Colors.text2 }}>
+                      <Text className="font-bold" style={{ color: Colors.text2, fontSize: rs.sm }}>
                         ✕ 취소 (원래대로)
                       </Text>
                     </Pressable>
@@ -983,7 +1005,7 @@ export default function TeamManagementScreen() {
                       className="bg-primary rounded-xl py-4 items-center active:scale-[0.97]"
                       onPress={handleEditSave}
                     >
-                      <Text className="text-tablet-sm font-bold text-white">
+                      <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>
                         💾 팀 이름 저장
                       </Text>
                     </Pressable>
@@ -993,7 +1015,7 @@ export default function TeamManagementScreen() {
                       onPress={handleReassign}
                       disabled={editMembers.length === 0}
                     >
-                      <Text className="text-tablet-sm font-bold" style={{ color: Colors.bg }}>
+                      <Text className="font-bold" style={{ color: Colors.bg, fontSize: rs.sm }}>
                         🔄 소폭 교체 (1-2명)
                       </Text>
                     </Pressable>

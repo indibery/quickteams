@@ -13,6 +13,7 @@ import { useTeamStore } from "@/stores/teamStore";
 import type { Team } from "@/lib/types";
 import PickerSelect from "@/components/common/PickerSelect";
 import { Colors } from "@/constants/theme";
+import { useResponsiveSizes } from "@/hooks/useResponsiveSizes";
 const gradeOptions = [
   { label: "전체", value: 0 },
   ...Array.from({ length: 6 }, (_, i) => ({
@@ -25,6 +26,7 @@ export default function TeamsListScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const { teams, isLoading, loadTeamsByGrade, loadAllTeams } = useTeamStore();
+  const rs = useResponsiveSizes();
   const [grade, setGrade] = useState(0);
 
   useEffect(() => {
@@ -99,7 +101,7 @@ export default function TeamsListScreen() {
           <View className="w-20 h-20 rounded-3xl items-center justify-center mb-4" style={{ backgroundColor: Colors.surface }}>
             <Text style={{ fontSize: 36 }}>📋</Text>
           </View>
-          <Text className="text-tablet-sm" style={{ color: Colors.text2 }}>
+          <Text style={{ color: Colors.text2, fontSize: rs.sm }}>
             저장된 팀이 없습니다
           </Text>
           <Pressable

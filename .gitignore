@@ -33,6 +33,25 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Google Play service account key
+pc-api-key.json
+
+# EAS local build output
+build-*.aab
+build-*.apk
+
+# Android SDK (Homebrew symlinks)
+build-tools/
+platform-tools/
+platforms/
+licenses/
+
+# IDE
+.idea/
+
+# SQLite database
+*.db
+
 # typescript
 *.tsbuildinfo
 

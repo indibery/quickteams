@@ -7,6 +7,7 @@ import {
   Modal,
   TextInput,
   Linking,
+  Platform,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSQLiteContext } from "expo-sqlite";
@@ -21,6 +22,7 @@ import {
 import PickerSelect from "@/components/common/PickerSelect";
 import type { Gender } from "@/lib/types";
 import { Colors } from "@/constants/theme";
+import { useResponsiveSizes } from "@/hooks/useResponsiveSizes";
 
 const gradeOptions = Array.from({ length: 6 }, (_, i) => ({
   label: `${i + 1}학년`,
@@ -70,6 +72,7 @@ function parseLine(
 export default function SettingsScreen() {
   const db = useSQLiteContext();
   const insets = useSafeAreaInsets();
+  const rs = useResponsiveSizes();
   const [showBatchImport, setShowBatchImport] = useState(false);
   const [batchGrade, setBatchGrade] = useState(1);
   const [batchClass, setBatchClass] = useState(1);
@@ -164,7 +167,7 @@ export default function SettingsScreen() {
           className="rounded-2xl p-5 mb-4"
           style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
+          <Text className="font-bold mb-3" style={{ color: Colors.text1, fontSize: rs.sm }}>
             학생 일괄 입력
           </Text>
           <Text className="text-xs mb-3" style={{ color: Colors.text3 }}>
@@ -175,7 +178,7 @@ export default function SettingsScreen() {
             style={{ backgroundColor: Colors.primarySoft }}
             onPress={() => setShowBatchImport(true)}
           >
-            <Text className="text-tablet-sm font-bold" style={{ color: Colors.primary }}>
+            <Text className="font-bold" style={{ color: Colors.primary, fontSize: rs.sm }}>
               📋 일괄 입력 열기
             </Text>
           </Pressable>
@@ -186,7 +189,7 @@ export default function SettingsScreen() {
           className="rounded-2xl p-5 mb-4"
           style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-md font-bold mb-1" style={{ color: Colors.text1 }}>
+          <Text className="font-bold mb-1" style={{ color: Colors.text1, fontSize: rs.md }}>
             바로팀 v2.1.0
           </Text>
           <Text className="text-sm mb-3" style={{ color: Colors.text3 }}>
@@ -211,7 +214,7 @@ export default function SettingsScreen() {
           className="rounded-2xl p-5 mb-4"
           style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
+          <Text className="font-bold mb-3" style={{ color: Colors.text1, fontSize: rs.sm }}>
             능력 점수 공식
           </Text>
           <InfoRow label="기본" value="달리기 상대 순위 (1~5)" />
@@ -227,7 +230,7 @@ export default function SettingsScreen() {
           className="rounded-2xl p-5 mb-4"
           style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-sm font-bold mb-3" style={{ color: Colors.text1 }}>
+          <Text className="font-bold mb-3" style={{ color: Colors.text1, fontSize: rs.sm }}>
             데이터 관리
           </Text>
           <Pressable
@@ -235,7 +238,7 @@ export default function SettingsScreen() {
             style={{ backgroundColor: Colors.primarySoft }}
             onPress={handleExportCSV}
           >
-            <Text className="text-tablet-sm font-bold" style={{ color: Colors.primary }}>
+            <Text className="font-bold" style={{ color: Colors.primary, fontSize: rs.sm }}>
               📤 학생 데이터 CSV 내보내기
             </Text>
           </Pressable>
@@ -244,7 +247,7 @@ export default function SettingsScreen() {
             style={{ backgroundColor: Colors.dangerSoft }}
             onPress={handleResetData}
           >
-            <Text className="text-tablet-sm font-bold" style={{ color: Colors.dangerText }}>
+            <Text className="font-bold" style={{ color: Colors.dangerText, fontSize: rs.sm }}>
               🗑️ 전체 데이터 초기화
             </Text>
           </Pressable>
@@ -255,7 +258,7 @@ export default function SettingsScreen() {
           className="rounded-2xl p-5 mb-8"
           style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}
         >
-          <Text className="text-tablet-sm font-bold mb-2" style={{ color: Colors.text1 }}>
+          <Text className="font-bold mb-2" style={{ color: Colors.text1, fontSize: rs.sm }}>
             개인정보 보호
           </Text>
           <Text className="text-sm leading-5" style={{ color: Colors.text2 }}>
@@ -273,7 +276,10 @@ export default function SettingsScreen() {
             <Text className="text-xl font-bold" style={{ color: Colors.text1 }}>학생 일괄 입력</Text>
           </View>
 
-          <ScrollView className="flex-1 px-6 pt-4">
+          <ScrollView
+            className="flex-1 px-6 pt-4"
+            contentContainerStyle={Platform.OS === "android" ? { paddingBottom: insets.bottom + 16 } : undefined}
+          >
             {/* 학년/반 선택 + 버튼 */}
             <View className="flex-row gap-3 mb-4">
               <View className="flex-1">
@@ -295,25 +301,25 @@ export default function SettingsScreen() {
               <Pressable
                 className="rounded-xl px-5 items-center justify-center self-end"
                 style={{
-                  height: 50,
+                  height: rs.buttonH,
                   backgroundColor: previewCount > 0 ? Colors.primary : Colors.pillBg,
                 }}
                 onPress={handleBatchImport}
                 disabled={previewCount === 0}
               >
-                <Text className="text-tablet-sm font-bold text-white">
+                <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>
                   {previewCount > 0 ? `${previewCount}명 입력` : "입력"}
                 </Text>
               </Pressable>
               <Pressable
                 className="rounded-xl px-4 items-center justify-center self-end"
-                style={{ height: 50, backgroundColor: Colors.surface }}
+                style={{ height: rs.buttonH, backgroundColor: Colors.surface }}
                 onPress={() => {
                   setShowBatchImport(false);
                   setBatchText("");
                 }}
               >
-                <Text className="text-tablet-sm font-bold" style={{ color: Colors.text2 }}>취소</Text>
+                <Text className="font-bold" style={{ color: Colors.text2, fontSize: rs.sm }}>취소</Text>
               </Pressable>
             </View>
 
@@ -341,7 +347,7 @@ export default function SettingsScreen() {
               style={{
                 borderRadius: 12,
                 padding: 16,
-                fontSize: 16,
+                fontSize: rs.inputFs,
                 marginBottom: 16,
                 minHeight: 200,
                 textAlignVertical: "top",
