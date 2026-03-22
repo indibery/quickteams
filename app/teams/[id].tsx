@@ -23,7 +23,7 @@ export default function TeamDetailScreen() {
   // 아이패드: 큰 글씨 4열, 아이폰: 3열
   const cols = isTablet ? 4 : 3;
   const colWidth = isTablet ? "25%" : "33%";
-  const nameFontSize = isTablet ? 44 : 26;
+  const nameFontSize = isTablet ? 37 : 26;
   const genderFontSize = isTablet ? 18 : 12;
   const headerFontSize = isTablet ? 26 : 16;
   const infoFontSize = isTablet ? 28 : 18;

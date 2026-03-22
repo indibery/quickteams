@@ -9,6 +9,7 @@ import {
   TextInput,
   ActivityIndicator,
   Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSQLiteContext } from "expo-sqlite";
@@ -232,7 +233,6 @@ export default function TeamManagementScreen() {
     await updateLabel(db, editTeam.id, editLabel);
     await loadAllTeams(db);
     setEditTeam(null);
-    Alert.alert("저장 완료", "팀 이름이 저장되었습니다.");
   };
 
   const handleReassign = async () => {
@@ -918,9 +918,15 @@ export default function TeamManagementScreen() {
           </View>
 
           {editTeam && (
+            <KeyboardAvoidingView
+              className="flex-1"
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
+              keyboardVerticalOffset={insets.top + 56}
+            >
             <ScrollView
               className="flex-1 px-6 pt-4"
               contentContainerStyle={Platform.OS === "android" ? { paddingBottom: insets.bottom + 16 } : undefined}
+              keyboardShouldPersistTaps="handled"
             >
               {/* 팀 정보 */}
               <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
@@ -1197,6 +1203,7 @@ export default function TeamManagementScreen() {
 
               <View className="mb-8" />
             </ScrollView>
+            </KeyboardAvoidingView>
           )}
         </View>
       </Modal>

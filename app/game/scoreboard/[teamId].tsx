@@ -487,6 +487,8 @@ export default function ScoreboardScreen() {
                   textShadowRadius: 8,
                 }}
                 className="font-bold"
+                numberOfLines={1}
+                adjustsFontSizeToFit
               >
                 {score}
               </Text>
