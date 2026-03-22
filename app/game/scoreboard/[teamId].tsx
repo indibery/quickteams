@@ -489,6 +489,7 @@ export default function ScoreboardScreen() {
                 className="font-bold"
                 numberOfLines={1}
                 adjustsFontSizeToFit
+                minimumFontScale={0.75}
               >
                 {score}
               </Text>
