@@ -49,6 +49,12 @@ licenses/
 # IDE
 .idea/
 
+# Claude Code
+.claude/
+
+# Playwright MCP
+.playwright-mcp/
+
 # SQLite database
 *.db
 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1024px;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #3b82f6 100%);
+    font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+  /* subtle pattern */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%);
+  }
+  .container {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    position: relative;
+    z-index: 1;
+  }
+  .icon {
+    width: 180px;
+    height: 180px;
+    border-radius: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .text-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .subtitle {
+    font-size: 20px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 4px;
+    font-weight: 500;
+  }
+  .title {
+    font-size: 72px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.1;
+  }
+  .title span {
+    color: #FCD34D;
+  }
+  .desc {
+    font-size: 24px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 400;
+    margin-top: 4px;
+  }
+  /* decorative dots */
+  .dots {
+    position: absolute;
+    bottom: 40px;
+    right: 60px;
+    display: flex;
+    gap: 8px;
+    opacity: 0.3;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #FCD34D;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <img class="icon" src="/assets/icon.png" alt="바로팀">
+    <div class="text-area">
+      <div class="subtitle">SPORTS TEAM MAKER</div>
+      <div class="title">바로<span>팀</span></div>
+      <div class="desc">달리기 기록으로 공정하게 팀을 만들어요</div>
+    </div>
+  </div>
+  <div class="dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</body>
+</html>
