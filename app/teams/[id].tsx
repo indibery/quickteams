@@ -20,14 +20,14 @@ export default function TeamDetailScreen() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
 
-  // 아이패드: 큰 글씨 5열, 아이폰: 작은 글씨 4열
-  const cols = isTablet ? 5 : 4;
-  const colWidth = `${Math.floor(100 / cols)}%`;
-  const nameFontSize = isTablet ? 38 : 22;
-  const genderFontSize = isTablet ? 16 : 12;
-  const headerFontSize = isTablet ? 22 : 16;
-  const infoFontSize = isTablet ? 24 : 18;
-  const badgeFontSize = isTablet ? 18 : 14;
+  // 아이패드: 큰 글씨 4열, 아이폰: 3열
+  const cols = isTablet ? 4 : 3;
+  const colWidth = isTablet ? "25%" : "33%";
+  const nameFontSize = isTablet ? 44 : 26;
+  const genderFontSize = isTablet ? 18 : 12;
+  const headerFontSize = isTablet ? 26 : 16;
+  const infoFontSize = isTablet ? 28 : 18;
+  const badgeFontSize = isTablet ? 20 : 14;
 
   if (isLoading || !currentTeam) {
     return (
@@ -104,7 +104,7 @@ export default function TeamDetailScreen() {
                 </View>
               </View>
 
-              {/* 멤버 그리드 — 태블릿 5열 / 폰 4열 */}
+              {/* 멤버 그리드 — 태블릿 4열 / 폰 3열 */}
               <View className="flex-row flex-wrap px-2 py-3">
                 {group.members.map((m) => (
                   <View
@@ -115,7 +115,7 @@ export default function TeamDetailScreen() {
                     <View
                       style={{
                         backgroundColor: m.gender === "M" ? `${style.bg}1F` : `${style.bg}40`,
-                        minHeight: 48,
+                        minHeight: isTablet ? 64 : 48,
                       }}
                       className="rounded-xl py-2.5 px-2 flex-row items-center justify-center"
                     >

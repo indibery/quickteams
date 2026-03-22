@@ -148,7 +148,7 @@ function tryBestSwap(
  * 팀 이름으로 성별 그룹 판별
  * "N팀 남자" → "남자", "N팀 여자" → "여자", 그 외 → null (혼성)
  */
-function getGenderGroup(teamName: string): string | null {
+export function getGenderGroup(teamName: string): string | null {
   if (teamName.endsWith("남자")) return "남자";
   if (teamName.endsWith("여자")) return "여자";
   return null;
@@ -157,7 +157,7 @@ function getGenderGroup(teamName: string): string | null {
 /**
  * 성별분리 팀인지 판별 (하나라도 "남자"/"여자"로 끝나면 성별분리)
  */
-function isSeparateGenderTeams(teams: SwapTeam[]): boolean {
+export function isSeparateGenderTeams(teams: SwapTeam[]): boolean {
   return teams.some((t) => getGenderGroup(t.teamName) != null);
 }
 
@@ -236,4 +236,34 @@ export function partialSwap(
 
     return { teams, swappedIds, balanceBefore, balanceAfter };
   }
+}
+
+/**
+ * 멤버 배열로부터 균형 점수 계산 (수동 교체 시 실시간 표시용)
+ * 성별분리 팀이면 성별 그룹별 평균, 아니면 전체 기준
+ */
+export function calcBalance(
+  members: { teamName: string; abilityScore: number | null }[]
+): number {
+  const grouped: Record<string, { abilityScore: number | null }[]> = {};
+  for (const m of members) {
+    if (!grouped[m.teamName]) grouped[m.teamName] = [];
+    grouped[m.teamName].push(m);
+  }
+
+  const teams: SwapTeam[] = Object.entries(grouped).map(([teamName, ms]) => ({
+    teamName,
+    members: ms as SwapMember[],
+    averageScore: teamAverage(ms as SwapMember[]),
+  }));
+
+  if (isSeparateGenderTeams(teams)) {
+    const maleTeams = teams.filter((t) => getGenderGroup(t.teamName) === "남자");
+    const femaleTeams = teams.filter((t) => getGenderGroup(t.teamName) === "여자");
+    const maleScore = maleTeams.length > 0 ? balanceScore(maleTeams) : 100;
+    const femaleScore = femaleTeams.length > 0 ? balanceScore(femaleTeams) : 100;
+    return Math.round((maleScore + femaleScore) / 2);
+  }
+
+  return balanceScore(teams);
 }

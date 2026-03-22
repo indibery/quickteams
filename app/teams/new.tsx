@@ -26,7 +26,7 @@ import {
 } from "@/lib/algorithms/zigzagAssignment";
 import { recalculateAbilityScores } from "@/lib/db/repositories/studentRepository";
 import { getTeamMembers } from "@/lib/db/repositories/teamRepository";
-import { partialSwap, type SwapResult } from "@/lib/algorithms/partialSwap";
+import { partialSwap, calcBalance, getGenderGroup, type SwapResult } from "@/lib/algorithms/partialSwap";
 import { Colors, DOT_COLORS } from "@/constants/theme";
 
 type MemberWithInfo = {
@@ -116,6 +116,12 @@ export default function TeamManagementScreen() {
   const [editMembersLoading, setEditMembersLoading] = useState(false);
   const [swapResult, setSwapResult] = useState<SwapResult | null>(null); // 소폭 교체 결과
 
+  // --- 수동 교체 ---
+  const [manualSwapMode, setManualSwapMode] = useState(false);
+  const [selectedForSwap, setSelectedForSwap] = useState<MemberWithInfo | null>(null);
+  const [manualSwappedIds, setManualSwappedIds] = useState<number[]>([]);
+  const [manualSwapCount, setManualSwapCount] = useState(0);
+
   // 결과 화면에서 runningRecord 표시를 위한 학생 lookup map
   const studentMap = useMemo(
     () => new Map(storeStudents.map((s) => [s.id, s])),
@@ -198,24 +204,28 @@ export default function TeamManagementScreen() {
   };
 
   // --- 보기 로직 ---
-  const handleViewOpen = async (team: Team) => {
+  const handleViewOpen = useCallback(async (team: Team) => {
     setViewTeam(team);
     setViewLoading(true);
     const members = await getTeamMembers(db, team.id);
     setViewMembers(members);
     setViewLoading(false);
-  };
+  }, [db]);
 
   // --- 편집 로직 ---
-  const handleEditOpen = async (team: Team) => {
+  const handleEditOpen = useCallback(async (team: Team) => {
     setEditTeam(team);
     setEditLabel(team.label);
     setSwapResult(null);
+    setManualSwapMode(false);
+    setSelectedForSwap(null);
+    setManualSwappedIds([]);
+    setManualSwapCount(0);
     setEditMembersLoading(true);
     const members = await getTeamMembers(db, team.id);
     setEditMembers(members);
     setEditMembersLoading(false);
-  };
+  }, [db]);
 
   const handleEditSave = async () => {
     if (!editTeam) return;
@@ -276,7 +286,8 @@ export default function TeamManagementScreen() {
 
   // DB에 소폭 교체 결과 저장
   const handleSaveSwap = async () => {
-    if (!editTeam || !swapResult) return;
+    if (!editTeam || !swapResult || editMembersLoading) return;
+    setEditMembersLoading(true);
     const members = swapResult.teams.flatMap((team) =>
       team.members.map((m) => ({ studentId: m.studentId, teamName: team.teamName }))
     );
@@ -286,16 +297,83 @@ export default function TeamManagementScreen() {
     }
     await loadAllTeams(db);
     setSwapResult(null);
-    const savedId = editTeam.id;
-    setEditTeam(null);
-    Alert.alert(
-      "교체 완료",
-      `균형 점수: ${swapResult.balanceBefore}점 → ${swapResult.balanceAfter}점`,
-      [
-        { text: "팀 보기", onPress: () => router.push(`/teams/${savedId}`) },
-        { text: "확인" },
-      ]
-    );
+    const freshMembers = await getTeamMembers(db, editTeam.id);
+    setEditMembers(freshMembers);
+    setEditMembersLoading(false);
+  };
+
+  // --- 수동 교체 로직 ---
+  const handleManualSwapSelect = (member: MemberWithInfo) => {
+    if (!selectedForSwap) {
+      setSelectedForSwap(member);
+      return;
+    }
+    // 같은 학생 다시 탭 → 선택 해제
+    if (selectedForSwap.studentId === member.studentId) {
+      setSelectedForSwap(null);
+      return;
+    }
+    // 같은 팀 → 선택 전환
+    if (selectedForSwap.teamName === member.teamName) {
+      setSelectedForSwap(member);
+      return;
+    }
+    // 성별분리 팀: 다른 성별 그룹 차단
+    const groupA = getGenderGroup(selectedForSwap.teamName);
+    const groupB = getGenderGroup(member.teamName);
+    if (groupA && groupB && groupA !== groupB) {
+      Alert.alert("교체 불가", "성별분리 팀에서는 같은 성별 팀끼리만 교체할 수 있습니다.");
+      return;
+    }
+    // 교체 실행: teamName 교환
+    const newMembers = editMembers.map((m) => {
+      if (m.studentId === selectedForSwap.studentId) return { ...m, teamName: member.teamName };
+      if (m.studentId === member.studentId) return { ...m, teamName: selectedForSwap.teamName };
+      return m;
+    });
+    setEditMembers(newMembers);
+    setManualSwappedIds((prev) => [
+      ...prev.filter((id) => id !== selectedForSwap.studentId && id !== member.studentId),
+      selectedForSwap.studentId,
+      member.studentId,
+    ]);
+    setManualSwapCount((prev) => prev + 1);
+    setSelectedForSwap(null);
+  };
+
+  const handleManualSwapSave = async () => {
+    if (!editTeam || editMembersLoading) return;
+    setEditMembersLoading(true);
+    const members = editMembers.map((m) => ({
+      studentId: m.studentId,
+      teamName: m.teamName,
+    }));
+    await reassignMembers(db, editTeam.id, members);
+    if (editLabel !== editTeam.label) {
+      await updateLabel(db, editTeam.id, editLabel);
+    }
+    await loadAllTeams(db);
+    setManualSwapMode(false);
+    setSelectedForSwap(null);
+    setManualSwappedIds([]);
+    setManualSwapCount(0);
+    const freshMembers = await getTeamMembers(db, editTeam.id);
+    setEditMembers(freshMembers);
+    setEditMembersLoading(false);
+  };
+
+  const exitManualSwapMode = async () => {
+    setManualSwapMode(false);
+    setSelectedForSwap(null);
+    setManualSwappedIds([]);
+    setManualSwapCount(0);
+    // 원래 데이터로 복원
+    if (editTeam) {
+      setEditMembersLoading(true);
+      const members = await getTeamMembers(db, editTeam.id);
+      setEditMembers(members);
+      setEditMembersLoading(false);
+    }
   };
 
   // 전체 재배정 (팀원 없을 때 폴백)
@@ -325,7 +403,7 @@ export default function TeamManagementScreen() {
   };
 
   // --- 삭제 ---
-  const handleDelete = (team: Team) => {
+  const handleDelete = useCallback((team: Team) => {
     Alert.alert(
       "팀 삭제",
       `${team.grade}학년 ${team.class}반 ${team.teamCount}팀${team.label ? ` (${team.label})` : ""}을 삭제하시겠습니까?`,
@@ -341,7 +419,7 @@ export default function TeamManagementScreen() {
         },
       ]
     );
-  };
+  }, [db, removeTeam, loadAllTeams]);
 
   // --- 팀 카드 렌더 ---
   const renderTeam = useCallback(
@@ -399,7 +477,7 @@ export default function TeamManagementScreen() {
         </View>
       </View>
     ),
-    [router, rs]
+    [router, rs, handleViewOpen, handleEditOpen, handleDelete]
   );
 
   return (
@@ -802,7 +880,7 @@ export default function TeamManagementScreen() {
                   router.push(`/teams/${viewTeam.id}`);
                 }}
               >
-                <Text className="font-bold" style={{ color: Colors.primary, fontSize: rs.sm }}>📋 명단 전체 보기</Text>
+                <Text className="font-bold" style={{ color: Colors.primary, fontSize: rs.sm }}>📋 경기용 명단 보기</Text>
               </Pressable>
             </ScrollView>
           )}
@@ -814,7 +892,27 @@ export default function TeamManagementScreen() {
         <View className="flex-1" style={{ backgroundColor: Colors.bg, paddingTop: insets.top }}>
           <View className="px-6 py-4 flex-row items-center justify-between" style={{ backgroundColor: Colors.headerBg, borderBottomWidth: 1, borderBottomColor: Colors.border }}>
             <Text className="text-xl font-bold" style={{ color: Colors.text1 }}>팀 편집</Text>
-            <Pressable onPress={() => setEditTeam(null)} hitSlop={16} className="p-2">
+            <Pressable
+              onPress={() => {
+                if (manualSwappedIds.length > 0 || swapResult) {
+                  Alert.alert("편집 취소", "저장하지 않은 교체가 있습니다. 나가시겠습니까?", [
+                    { text: "계속 편집", style: "cancel" },
+                    { text: "나가기", style: "destructive", onPress: () => {
+                      setManualSwapMode(false);
+                      setSelectedForSwap(null);
+                      setManualSwappedIds([]);
+                      setManualSwapCount(0);
+                      setSwapResult(null);
+                      setEditTeam(null);
+                    }},
+                  ]);
+                } else {
+                  setEditTeam(null);
+                }
+              }}
+              hitSlop={16}
+              className="p-2"
+            >
               <Text className="text-lg" style={{ color: Colors.text2 }}>✕</Text>
             </Pressable>
           </View>
@@ -840,15 +938,31 @@ export default function TeamManagementScreen() {
               <View className="rounded-2xl p-5 mb-4" style={{ backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border }}>
                 <View className="flex-row items-center justify-between mb-3">
                   <Text className="font-bold" style={{ color: Colors.text1, fontSize: rs.sm }}>
-                    {swapResult ? "🔄 교체 미리보기" : "현재 팀원 구성"}
+                    {manualSwapMode ? "👆 수동 교체 모드" : swapResult ? "🔄 교체 미리보기" : "현재 팀원 구성"}
                   </Text>
-                  {swapResult && (
+                  {(swapResult || manualSwappedIds.length > 0) && (
                     <View className="flex-row items-center gap-1.5">
                       <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: Colors.swappedBorder }} />
                       <Text className="text-xs" style={{ color: Colors.text2 }}>교체된 인원</Text>
                     </View>
                   )}
                 </View>
+
+                {/* 수동 교체 안내 */}
+                {manualSwapMode && (
+                  <View className="rounded-xl px-4 py-3 mb-3" style={{ backgroundColor: Colors.primarySoft }}>
+                    <Text className="text-sm font-bold" style={{ color: Colors.primary }}>
+                      {selectedForSwap
+                        ? `✓ ${selectedForSwap.studentName} 선택됨 — 다른 팀 학생을 탭하세요`
+                        : "교체할 첫 번째 학생을 탭하세요"}
+                    </Text>
+                    {manualSwappedIds.length > 0 && (
+                      <Text className="text-xs mt-1" style={{ color: Colors.text2 }}>
+                        균형 점수: {calcBalance(editMembers)}점 · {manualSwapCount}회 교체
+                      </Text>
+                    )}
+                  </View>
+                )}
 
                 {editMembersLoading ? (
                   <ActivityIndicator size="small" color={Colors.primary} />
@@ -879,22 +993,35 @@ export default function TeamManagementScreen() {
                       {/* 멤버 칩 */}
                       <View className="flex-row flex-wrap gap-2">
                         {group.members.map((m) => {
-                          const isSwapped = swapResult?.swappedIds.includes(m.studentId) ?? false;
-                          return (
+                          const isSwapped = (swapResult?.swappedIds.includes(m.studentId) ?? false)
+                            || manualSwappedIds.includes(m.studentId);
+                          const isSelected = manualSwapMode && selectedForSwap?.studentId === m.studentId;
+
+                          const chipContent = (
                             <View
-                              key={m.id}
                               style={{
-                                backgroundColor: isSwapped ? Colors.swapped : (m.gender === "M" ? Colors.male : Colors.female),
-                                borderWidth: isSwapped ? 1.5 : 0,
-                                borderColor: isSwapped ? Colors.swappedBorder : "transparent",
+                                backgroundColor: isSelected
+                                  ? Colors.successSoft
+                                  : isSwapped
+                                    ? Colors.swapped
+                                    : m.gender === "M" ? Colors.male : Colors.female,
+                                borderWidth: isSelected ? 2 : isSwapped ? 1.5 : 0,
+                                borderColor: isSelected
+                                  ? Colors.success
+                                  : isSwapped
+                                    ? Colors.swappedBorder
+                                    : "transparent",
                               }}
                               className={`rounded-xl items-center ${rs.isTablet ? "px-3 py-2" : "px-2.5 py-1.5"}`}
                             >
                               <Text
                                 className="font-bold"
-                                style={{ color: isSwapped ? Colors.swappedText : Colors.text1, fontSize: rs.md }}
+                                style={{
+                                  color: isSelected ? Colors.success : isSwapped ? Colors.swappedText : Colors.text1,
+                                  fontSize: rs.md,
+                                }}
                               >
-                                {isSwapped ? "★ " : ""}{m.studentName}
+                                {isSwapped && !isSelected ? "★ " : ""}{m.studentName}
                               </Text>
                               {m.runningRecord != null && (
                                 <Text
@@ -905,6 +1032,17 @@ export default function TeamManagementScreen() {
                                 </Text>
                               )}
                             </View>
+                          );
+
+                          return manualSwapMode ? (
+                            <Pressable
+                              key={m.id}
+                              onPress={() => handleManualSwapSelect(m)}
+                            >
+                              {chipContent}
+                            </Pressable>
+                          ) : (
+                            <View key={m.id}>{chipContent}</View>
                           );
                         })}
                       </View>
@@ -937,6 +1075,93 @@ export default function TeamManagementScreen() {
                     )}
                   </View>
                 )}
+
+                {/* 교체 버튼 영역 */}
+                <View className="mt-4 pt-4 gap-3" style={{ borderTopWidth: 1, borderTopColor: Colors.border }}>
+                  {manualSwapMode ? (
+                    <>
+                      <Pressable
+                        className="bg-primary rounded-xl py-3.5 items-center active:scale-[0.97]"
+                        onPress={handleManualSwapSave}
+                        disabled={manualSwappedIds.length === 0}
+                        style={manualSwappedIds.length === 0 ? { opacity: 0.5 } : undefined}
+                      >
+                        <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>
+                          ✅ 수동 교체 저장
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        className="rounded-xl py-3.5 items-center active:opacity-80"
+                        style={{ backgroundColor: Colors.surface }}
+                        onPress={exitManualSwapMode}
+                      >
+                        <Text className="font-bold" style={{ color: Colors.text2, fontSize: rs.sm }}>
+                          ✕ 취소 (원래대로)
+                        </Text>
+                      </Pressable>
+                    </>
+                  ) : swapResult ? (
+                    <>
+                      <Pressable
+                        className="bg-primary rounded-xl py-3.5 items-center active:scale-[0.97]"
+                        onPress={handleSaveSwap}
+                      >
+                        <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>
+                          ✅ 교체 결과 저장
+                        </Text>
+                      </Pressable>
+                      <View className="flex-row gap-3">
+                        <Pressable
+                          className="flex-1 rounded-xl py-3.5 items-center active:scale-[0.97]"
+                          style={{ backgroundColor: Colors.warning }}
+                          onPress={handleReassign}
+                        >
+                          <Text className="font-bold" style={{ color: Colors.bg, fontSize: rs.sm }}>
+                            🔄 다시 교체
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          className="flex-1 rounded-xl py-3.5 items-center active:opacity-80"
+                          style={{ backgroundColor: Colors.surface }}
+                          onPress={async () => {
+                            setSwapResult(null);
+                            setEditMembersLoading(true);
+                            const members = await getTeamMembers(db, editTeam.id);
+                            setEditMembers(members);
+                            setEditMembersLoading(false);
+                          }}
+                        >
+                          <Text className="font-bold" style={{ color: Colors.text2, fontSize: rs.sm }}>
+                            ✕ 취소
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </>
+                  ) : (
+                    <View className="flex-row gap-3">
+                      <Pressable
+                        className="flex-1 rounded-xl py-3.5 items-center active:scale-[0.97]"
+                        style={{ backgroundColor: Colors.warning }}
+                        onPress={handleReassign}
+                        disabled={editMembers.length === 0}
+                      >
+                        <Text className="font-bold" style={{ color: Colors.bg, fontSize: rs.sm }}>
+                          🔄 임의교체
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        className="flex-1 rounded-xl py-3.5 items-center active:scale-[0.97]"
+                        style={{ backgroundColor: Colors.surface }}
+                        onPress={() => setManualSwapMode(true)}
+                        disabled={editMembers.length === 0}
+                      >
+                        <Text className="font-bold" style={{ color: Colors.text1, fontSize: rs.sm }}>
+                          👆 수동 교체
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
               </View>
 
               {/* 팀 이름 편집 */}
@@ -960,68 +1185,17 @@ export default function TeamManagementScreen() {
                   value={editLabel}
                   onChangeText={setEditLabel}
                 />
+                <Pressable
+                  className="bg-primary rounded-xl py-3.5 items-center active:scale-[0.97] mt-4"
+                  onPress={handleEditSave}
+                >
+                  <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>
+                    💾 팀 이름 저장
+                  </Text>
+                </Pressable>
               </View>
 
-              <View className="gap-3 mb-8">
-                {/* 교체 결과 있을 때: 저장 / 다시교체 */}
-                {swapResult ? (
-                  <>
-                    <Pressable
-                      className="bg-primary rounded-xl py-4 items-center active:scale-[0.97]"
-                      onPress={handleSaveSwap}
-                    >
-                      <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>
-                        ✅ 교체 결과 저장
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      className="rounded-xl py-4 items-center active:scale-[0.97]"
-                      style={{ backgroundColor: Colors.warning }}
-                      onPress={handleReassign}
-                    >
-                      <Text className="font-bold" style={{ color: Colors.bg, fontSize: rs.sm }}>
-                        🔄 다시 교체
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      className="rounded-xl py-4 items-center active:opacity-80"
-                      style={{ backgroundColor: Colors.surface }}
-                      onPress={async () => {
-                        setSwapResult(null);
-                        setEditMembersLoading(true);
-                        const members = await getTeamMembers(db, editTeam.id);
-                        setEditMembers(members);
-                        setEditMembersLoading(false);
-                      }}
-                    >
-                      <Text className="font-bold" style={{ color: Colors.text2, fontSize: rs.sm }}>
-                        ✕ 취소 (원래대로)
-                      </Text>
-                    </Pressable>
-                  </>
-                ) : (
-                  <>
-                    <Pressable
-                      className="bg-primary rounded-xl py-4 items-center active:scale-[0.97]"
-                      onPress={handleEditSave}
-                    >
-                      <Text className="font-bold text-white" style={{ fontSize: rs.sm }}>
-                        💾 팀 이름 저장
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      className="rounded-xl py-4 items-center active:scale-[0.97]"
-                      style={{ backgroundColor: Colors.warning }}
-                      onPress={handleReassign}
-                      disabled={editMembers.length === 0}
-                    >
-                      <Text className="font-bold" style={{ color: Colors.bg, fontSize: rs.sm }}>
-                        🔄 소폭 교체 (1-2명)
-                      </Text>
-                    </Pressable>
-                  </>
-                )}
-              </View>
+              <View className="mb-8" />
             </ScrollView>
           )}
         </View>
