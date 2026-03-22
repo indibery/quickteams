@@ -193,11 +193,13 @@ export default function ScoreboardScreen() {
   const isTwo = teamCount === 2;
   const isMany = teamCount >= 5;
 
-  // 점수 폰트 사이즈
+  // 점수 폰트 사이즈 (높이 기반 + 팀당 너비 기반 중 작은 값)
+  const colsPerRow = isTwo ? 2 : isMany ? 3 : 2;
+  const maxByWidth = Math.floor(width / colsPerRow * 0.55);
   const scoreFontSize = isMany ? 80
     : isTablet && isLandscape ? Math.floor(height * 0.5)
     : isLandscape ? Math.floor(height * 0.3)
-    : isTablet ? Math.floor(height * 0.29) : 120;
+    : isTablet ? Math.min(Math.floor(height * 0.29), maxByWidth) : Math.min(120, maxByWidth);
   const nameFontSize = isMany ? 28
     : isTablet && isLandscape ? Math.floor(height * 0.07)
     : isLandscape ? Math.floor(height * 0.07)
@@ -487,9 +489,6 @@ export default function ScoreboardScreen() {
                   textShadowRadius: 8,
                 }}
                 className="font-bold"
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.75}
               >
                 {score}
               </Text>
