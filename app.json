@@ -2,7 +2,7 @@
   "expo": {
     "name": "바로팀",
     "slug": "QuickTeams",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "scheme": "quickteams",
     "orientation": "default",
     "icon": "./assets/icon.png",
